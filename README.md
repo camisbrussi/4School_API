@@ -31,7 +31,8 @@ Rodar os comandos
 
 1. Faça clone do projeto;
 2. na pasta do projeto
-  ```npm i 
+  ```
+  npm i 
   npx sequelize db:migrate 
   npx sequelize db:seeds:all
   npm run dev
