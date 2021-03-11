@@ -10,6 +10,7 @@ export default (req, res, next) => {
   }
 
   const [, token] = authorization.split(' ');
+  console.log(token)
   try{
     const data = jwt.verify(token, process.env.TOKEN_SECRET);
     const { id, login } = data;
@@ -17,6 +18,7 @@ export default (req, res, next) => {
     req.userLogin = login;
     return next();
   } catch(e){
+    console.log(e);
       return res.status(401).json({
       errors: ['Token expirado ou inválido'],
     })
