@@ -21,13 +21,7 @@ export default class activity extends Model {
         }, 
         description: { 
           type: Sequelize.TEXT, 
-          defaultValue: "", 
-          validate: { 
-            len: { 
-              args: [2, 255], 
-              msg: "Login field must be between 3 and 65535 characters", 
-            }, 
-          }, 
+          defaultValue: " ",
         }, 
         start: { 
           type: Sequelize.DATE, 

@@ -1,21 +1,22 @@
 import Activity from "../models/activity";
-import Activity_status from "../models/activity_status"
+
 
 
 class ActivityController {
 
-  async index(req, res) {
-    const activities = await Activity.findAll({
-      attributes: ["id", "name", "start", "end", "status_id"],
-      order: ["name"],
-    });
-    res.json(activities);
-  }
-
   async store(req, res) {
     try {
-      const activity = await Activity.create(req.body);
-      return res.json(activity);
+      const {name, description, start, end, generate_certificate, vacancies} = req.body;
+
+      console.log('generate_certificate'+generate_certificate)
+      
+      const status_id = 1;
+
+      await Activity.create({
+        name, description, start, end, generate_certificate, vacancies, status_id
+      })
+
+      return res.json({success:'Registrado com sucesso'});
     } catch (e) {
       console.log(e)
       return res.status(400).json({
@@ -24,6 +25,17 @@ class ActivityController {
       });
     }
   }
+
+
+  
+  async index(req, res) {
+    const activities = await Activity.findAll({
+      attributes: ["id", "name", "start", "end", "status_id"],
+      order: ["name"],
+    });
+    res.json(activities);
+  }
+
 
   async show(req, res) {
     try {
@@ -64,8 +76,9 @@ class ActivityController {
         });
       }
 
-      const activityUpdated = await activity.update(req.body);
-      return res.json(activityUpdated);
+      await activity.update(req.body);
+      return res.json({success:'Editado com sucesso'});
+
     } catch (e) {
       console.log(e)
       return res.status(400).json({

@@ -4,7 +4,6 @@ class UserController {
   async store(req, res) {
     try {
       const { name, login, password } = req.body;
-      console.log(name, login, password)
 
       const status_id = 1;
       await User.create({
@@ -37,8 +36,8 @@ class UserController {
     try {
       const user = await User.findByPk(req.params.id);
 
-      const { id, login } = user;
-      return res.json({ id, login });
+      
+      return res.json(user);
     } catch (e) {
       return res.json(null);
     }
@@ -56,13 +55,25 @@ class UserController {
       const user = await User.findByPk(id);
 
       if (!user) {
+        
         return res.status(400).json({
           errors: ["User does not exist"],
         });
       }
-      const userUpdated = await user.update(req.body);
-      return res.json(userUpdated);
+
+      const { name, login, password} = req.body;
+      
+      if(password) await user.update(req.body);
+      else { await user.update({
+          name,
+          login,
+        });
+      }
+      
+      return res.json({success:'Editado com sucesso'});
+
     } catch (e) {
+      console.log(e)
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

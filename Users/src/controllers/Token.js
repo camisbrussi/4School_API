@@ -12,7 +12,7 @@ class TokenController {
     }
     const user = await User.findOne({ where: { login } });
 
-    if (!login || login.id_status === 2) {
+    if (!login || user.status_id === 2 || user.status_id === 3) {
       return res.status(401).json({
         errors: ["Invalid credentials"],
       });
