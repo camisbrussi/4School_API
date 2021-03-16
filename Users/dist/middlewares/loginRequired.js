@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken';
+"use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _jsonwebtoken = require('jsonwebtoken'); var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
 
-export default (req, res, next) => {
+exports. default = (req, res, next) => {
   const { authorization } = req.headers;
 
   if(!authorization){
@@ -10,9 +10,9 @@ export default (req, res, next) => {
   }
 
   const [, token] = authorization.split(' ');
-  
+  console.log(token)
   try{
-    const data = jwt.verify(token, process.env.TOKEN_SECRET);
+    const data = _jsonwebtoken2.default.verify(token, process.env.TOKEN_SECRET);
     const { id, login } = data;
     req.userId = id;
     req.userLogin = login;

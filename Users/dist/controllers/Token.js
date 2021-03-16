@@ -1,9 +1,8 @@
-import jwt from "jsonwebtoken";
-import User from "../models/user";
+"use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _jsonwebtoken = require('jsonwebtoken'); var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
+var _user = require('../models/user'); var _user2 = _interopRequireDefault(_user);
 
 class TokenController {
   async store(req, res) {
-  
     const { login = "", password = "" } = req.body;
 
     if (!login || !password) {
@@ -11,7 +10,7 @@ class TokenController {
         errors: ["Invalid credentials"],
       });
     }
-    const user = await User.findOne({ where: { login } });
+    const user = await _user2.default.findOne({ where: { login } });
 
     if (!login || user.status_id === 2 || user.status_id === 3) {
       return res.status(401).json({
@@ -32,7 +31,7 @@ class TokenController {
     }
 
     const { id } = user;
-    const token = jwt.sign({ id, login }, process.env.TOKEN_SECRET, {
+    const token = _jsonwebtoken2.default.sign({ id, login }, process.env.TOKEN_SECRET, {
       expiresIn: process.env.TOKEN_EXPIRATION,
     });
 
@@ -47,4 +46,4 @@ class TokenController {
   }
 }
 
-export default new TokenController();
+exports. default = new TokenController();
