@@ -3,6 +3,7 @@ var _user = require('../models/user'); var _user2 = _interopRequireDefault(_user
 
 class TokenController {
   async store(req, res) {
+  
     const { login = "", password = "" } = req.body;
 
     if (!login || !password) {

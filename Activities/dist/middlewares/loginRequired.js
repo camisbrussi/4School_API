@@ -10,7 +10,6 @@ exports. default = (req, res, next) => {
   }
 
   const [, token] = authorization.split(' ');
-  
   try{
     const data = _jsonwebtoken2.default.verify(token, process.env.TOKEN_SECRET);
     const { id, login } = data;
@@ -18,7 +17,6 @@ exports. default = (req, res, next) => {
     req.userLogin = login;
     return next();
   } catch(e){
-    console.log(e);
       return res.status(401).json({
       errors: ['Token expirado ou inválido'],
     })
