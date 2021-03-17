@@ -14,7 +14,7 @@ export default class activity extends Model {
           defaultValue: "", 
           validate: { 
             len: { 
-              args: [2, 255], 
+              args: [3, 80],
               msg: "Name field must be between 3 and 80 characters", 
             }, 
           }, 
