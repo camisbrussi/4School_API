@@ -14,7 +14,8 @@ import activityRoutes from "./routes/activity";
 
 const whiteList = [
   'http://localhost:3000',
-  'http://localhost:3001'
+  'http://localhost:3001',
+  'https://4school.netlify.app'
 ]
 
 const corsOptions = {
