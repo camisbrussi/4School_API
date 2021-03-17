@@ -16,7 +16,8 @@ var _token = require('./routes/token'); var _token2 = _interopRequireDefault(_to
 
 const whiteList = [
   'http://localhost:3000',
-  'http://localhost:3001'
+  'http://localhost:3001',
+  'https://4school.netlify.app'
 ]
 
 const corsOptions = {
