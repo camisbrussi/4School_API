@@ -4,7 +4,9 @@ require('dotenv').config();
 dotenv.config();
 
 import Teacher from "../models/teacher";
+import TeacherStatus from "../models/teacher_status";
 import Person from "../models/person";
+import PersonType from "../models/person_type";
 
 class TeacherController {
     async store(req, res) {
@@ -28,14 +30,30 @@ class TeacherController {
 
     async index(req, res) {
         try {
-            const teachers = await Person.findAll({
-                attributes:["type_id", "name", "cpf", "email", "birth_date"],
-                include: {
-                    model: Teacher,
-                    attributes:  ["id", "status_id"],
-                },
-                order: ["name"],
+            const teachers = await Teacher.findAll({
+                attributes: ["id"],
+                include: [
+                    {
+                        model: Person,
+                        as: "person",
+                        attributes: ["id", "name", "cpf", "email", "birth_date"],
+                        include: {
+                            model:PersonType,
+                            as: "type",
+                            attributes: ["id","description"]
+                        }
+                    },{
+                        model: TeacherStatus,
+                        as: "status",
+                        attributes: ["id", "description"]
+                    }
+                ],
+                order: [
+                    "status_id",
+                    [Person, "name", "asc"]
+                ]
             });
+
             res.json(teachers);
         } catch (e) {
             console.log(e);
@@ -52,11 +70,23 @@ class TeacherController {
             }
 
             const teacher = await Teacher.findByPk(id, {
-                attributes: ["id", "status_id", "person.name", "person.cpf", "person.email", "person.birth_date"],
-                include: {
-                    model: Person,
-                    as: "person"
-                },
+                attributes: ["id"],
+                include: [
+                    {
+                        model: Person,
+                        as: "person",
+                        attributes: ["id", "name", "cpf", "email", "birth_date"],
+                        include: {
+                            model:PersonType,
+                            as: "type",
+                            attributes: ["id","description"]
+                        }
+                    },{
+                        model: TeacherStatus,
+                        as: "status",
+                        attributes: ["id", "description"]
+                    }
+                ]
             });
             if (!teacher) {
                 return res.status(400).json({
@@ -96,13 +126,13 @@ class TeacherController {
                 });
             }
 
-            const {status_id, name, cpf, email, birth_date} = req.params;
-
-            await teacher.update({status_id});
+            const {status_id, name, cpf, email, birth_date} = req.body;
+            if (status_id) {
+                await teacher.update({status_id});
+            }
             await person.update({name, cpf, email, birth_date});
 
             return res.json({success: 'Editado com sucesso'});
-
         } catch (e) {
             console.log(e)
             return res.status(400).json({

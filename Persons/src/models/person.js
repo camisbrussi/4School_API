@@ -53,7 +53,8 @@ export default class person extends Model {
     }
 
     static associate(models) {
-        this.hasOne(models.teacher, {foreignKey: 'person_id'});
-        this.hasOne(models.person_type, {foreignKey: 'type_id'})
+        this.hasOne(models.teacher, {foreignKey: "person_id"});
+
+        this.belongsTo(models.person_type, {foreignKey: "type_id", as:"type"});
     }
 } 

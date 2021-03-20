@@ -25,4 +25,8 @@ export default class person_type extends Model {
         );
         return this;
     }
+
+    static associate(models) {
+        this.hasMany(models.person, {foreignKey: 'type_id'});
+    }
 }

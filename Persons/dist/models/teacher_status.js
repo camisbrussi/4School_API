@@ -25,4 +25,8 @@
         );
         return this;
     }
+
+    static associate(models) {
+        this.hasMany(models.teacher, {foreignKey: "status_id"});
+    }
 } exports.default = teacher_status;

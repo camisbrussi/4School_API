@@ -4,7 +4,9 @@ require('dotenv').config();
 _dotenv2.default.config();
 
 var _teacher = require('../models/teacher'); var _teacher2 = _interopRequireDefault(_teacher);
+var _teacher_status = require('../models/teacher_status'); var _teacher_status2 = _interopRequireDefault(_teacher_status);
 var _person = require('../models/person'); var _person2 = _interopRequireDefault(_person);
+var _person_type = require('../models/person_type'); var _person_type2 = _interopRequireDefault(_person_type);
 
 class TeacherController {
     async store(req, res) {
@@ -29,13 +31,29 @@ class TeacherController {
     async index(req, res) {
         try {
             const teachers = await _teacher2.default.findAll({
-                attributes: ["id", "status_id", "person.name", "person.cpf", "person.email", "person.birth_date"],
-                include: {
-                    model: _person2.default,
-                    as: "person"
-                },
-                order: ["name"],
+                attributes: ["id"],
+                include: [
+                    {
+                        model: _person2.default,
+                        as: "person",
+                        attributes: ["id", "name", "cpf", "email", "birth_date"],
+                        include: {
+                            model:_person_type2.default,
+                            as: "type",
+                            attributes: ["id","description"]
+                        }
+                    },{
+                        model: _teacher_status2.default,
+                        as: "status",
+                        attributes: ["id", "description"]
+                    }
+                ],
+                order: [
+                    "status_id",
+                    [_person2.default, "name", "asc"]
+                ]
             });
+
             res.json(teachers);
         } catch (e) {
             console.log(e);
@@ -52,11 +70,23 @@ class TeacherController {
             }
 
             const teacher = await _teacher2.default.findByPk(id, {
-                attributes: ["id", "status_id", "person.name", "person.cpf", "person.email", "person.birth_date"],
-                include: {
-                    model: _person2.default,
-                    as: "person"
-                },
+                attributes: ["id"],
+                include: [
+                    {
+                        model: _person2.default,
+                        as: "person",
+                        attributes: ["id", "name", "cpf", "email", "birth_date"],
+                        include: {
+                            model:_person_type2.default,
+                            as: "type",
+                            attributes: ["id","description"]
+                        }
+                    },{
+                        model: _teacher_status2.default,
+                        as: "status",
+                        attributes: ["id", "description"]
+                    }
+                ]
             });
             if (!teacher) {
                 return res.status(400).json({
@@ -96,13 +126,15 @@ class TeacherController {
                 });
             }
 
-            const {status_id, name, cpf, email, birth_date} = req.params;
+            let {status_id, name, cpf, email, birth_date} = req.body;
+            if (!status_id) {
+                status_id = teacher.status_id;
+            }
 
             await teacher.update({status_id});
             await person.update({name, cpf, email, birth_date});
 
             return res.json({success: 'Editado com sucesso'});
-
         } catch (e) {
             console.log(e)
             return res.status(400).json({

@@ -25,4 +25,8 @@ export default class teacher_status extends Model {
         );
         return this;
     }
+
+    static associate(models) {
+        this.hasMany(models.teacher, {foreignKey: "status_id"});
+    }
 }

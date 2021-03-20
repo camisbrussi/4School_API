@@ -25,4 +25,8 @@
         );
         return this;
     }
+
+    static associate(models) {
+        this.hasMany(models.person, {foreignKey: 'type_id'});
+    }
 } exports.default = person_type;
