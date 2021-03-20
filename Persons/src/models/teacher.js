@@ -9,11 +9,11 @@ export default class teacher extends Model {
                 /*person_id: {
                     type: Sequelize.INTEGER,
                     defaultValue: ""
-                },*/
+                },
                 status_id: {
                     type: Sequelize.INTEGER,
                     defaultValue: "",
-                }
+                }*/
             },
             {
                 sequelize,

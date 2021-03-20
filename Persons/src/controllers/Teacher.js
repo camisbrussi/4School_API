@@ -7,17 +7,25 @@ import Teacher from "../models/teacher";
 import TeacherStatus from "../models/teacher_status";
 import Person from "../models/person";
 import PersonType from "../models/person_type";
+import Phone from "../models/phone";
 
 class TeacherController {
     async store(req, res) {
         try {
-            const {name, cpf, email, birth_date} = req.body;
+            const {name, cpf, email, birth_date, phones} = req.body;
             const type_id = process.env.TEACHER_PERSON_TYPE;
             const status_id = process.env.TEACHER_STATUS_ACTIVE;
 
             const person = await Person.create({type_id, name, cpf, email, birth_date});
             const person_id = person.id;
             await Teacher.create({person_id, status_id});
+
+            if (phones) {
+                phones.map((v, k) => {
+                    let {number, is_whatsapp} = v;
+                    Phone.create({person_id, number, is_whatsapp});
+                });
+            }
 
             return res.json({success: 'Registrado com sucesso'});
         } catch (e) {
@@ -37,12 +45,18 @@ class TeacherController {
                         model: Person,
                         as: "person",
                         attributes: ["id", "name", "cpf", "email", "birth_date"],
-                        include: {
-                            model:PersonType,
-                            as: "type",
-                            attributes: ["id","description"]
-                        }
-                    },{
+                        include: [
+                            {
+                                model: PersonType,
+                                as: "type",
+                                attributes: ["id", "description"]
+                            }, {
+                                model: Phone,
+                                as: "phones",
+                                attributes: ["id", "number", "is_whatsapp"]
+                            }
+                        ]
+                    }, {
                         model: TeacherStatus,
                         as: "status",
                         attributes: ["id", "description"]
@@ -76,12 +90,18 @@ class TeacherController {
                         model: Person,
                         as: "person",
                         attributes: ["id", "name", "cpf", "email", "birth_date"],
-                        include: {
-                            model:PersonType,
-                            as: "type",
-                            attributes: ["id","description"]
-                        }
-                    },{
+                        include: [
+                            {
+                                model: PersonType,
+                                as: "type",
+                                attributes: ["id", "description"]
+                            },{
+                                model: Phone,
+                                as: "phones",
+                                attributes: ["id", "number", "is_whatsapp"]
+                            }
+                        ]
+                    }, {
                         model: TeacherStatus,
                         as: "status",
                         attributes: ["id", "description"]
@@ -126,11 +146,22 @@ class TeacherController {
                 });
             }
 
-            const {status_id, name, cpf, email, birth_date} = req.body;
+            const {status_id, name, cpf, email, birth_date, phones} = req.body;
             if (status_id) {
                 await teacher.update({status_id});
             }
             await person.update({name, cpf, email, birth_date});
+
+            await Phone.destroy({
+                where: { "person_id":person.id }
+            });
+
+            if (phones) {
+                await phones.map((v,k) => {
+                    let {number, is_whatsapp} = v;
+                    Phone.create({"person_id":person.id, number, is_whatsapp});
+                });
+            }
 
             return res.json({success: 'Editado com sucesso'});
         } catch (e) {

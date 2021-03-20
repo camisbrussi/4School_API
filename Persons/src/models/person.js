@@ -1,6 +1,5 @@
 import Sequelize, {Model} from "sequelize";
 
-
 export default class person extends Model {
     static init(sequelize) {
         super.init(
@@ -54,6 +53,7 @@ export default class person extends Model {
 
     static associate(models) {
         this.hasOne(models.teacher, {foreignKey: "person_id"});
+        this.hasMany(models.phone, {foreignKey: "person_id"});
 
         this.belongsTo(models.person_type, {foreignKey: "type_id", as:"type"});
     }

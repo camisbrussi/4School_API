@@ -9,11 +9,11 @@ var _person = require('./person'); var _person2 = _interopRequireDefault(_person
                 /*person_id: {
                     type: Sequelize.INTEGER,
                     defaultValue: ""
-                },*/
+                },
                 status_id: {
-                    type: _sequelize2.default.INTEGER,
+                    type: Sequelize.INTEGER,
                     defaultValue: "",
-                }
+                }*/
             },
             {
                 sequelize,
