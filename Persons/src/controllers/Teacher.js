@@ -28,11 +28,11 @@ class TeacherController {
 
     async index(req, res) {
         try {
-            const teachers = await Teacher.findAll({
-                attributes: ["id", "status_id", "person.name", "person.cpf", "person.email", "person.birth_date"],
+            const teachers = await Person.findAll({
+                attributes:["type_id", "name", "cpf", "email", "birth_date"],
                 include: {
-                    model: Person,
-                    as: "person"
+                    model: Teacher,
+                    attributes:  ["id", "status_id"],
                 },
                 order: ["name"],
             });

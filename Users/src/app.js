@@ -17,7 +17,7 @@ import tokenRoutes from "./routes/token";
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://4school.netlify.app'
+  'https://54.94.70.35'
 ]
 
 const corsOptions = {
@@ -38,7 +38,7 @@ class App {
   }
 
   middlewares() {
-   // this.app.use(cors(corsOptions));
+    this.app.use(cors(corsOptions));
     this.app.use(helmet());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());

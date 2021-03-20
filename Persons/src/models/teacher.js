@@ -22,7 +22,7 @@ export default class teacher extends Model {
     }
 
     static associate(models) {
-        this.hasOne(models.person, {foreignKey: 'person_id'});
+        
         this.hasOne(models.teacher_status, {foreignKey: 'status_id'});
     }
 } 
