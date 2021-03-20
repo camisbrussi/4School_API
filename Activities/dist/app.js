@@ -36,7 +36,7 @@ class App {
   }
 
   middlewares() {
-    this.app.use(_cors2.default.call(void 0, corsOptions));
+   // this.app.use(cors(corsOptions));
     this.app.use(_helmet2.default.call(void 0, ));
     this.app.use(_express2.default.urlencoded({ extended: true }));
     this.app.use(_express2.default.json());
