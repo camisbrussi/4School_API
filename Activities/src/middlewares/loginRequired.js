@@ -10,6 +10,7 @@ export default (req, res, next) => {
   }
 
   const [, token] = authorization.split(' ');
+  console.log('TOKEN'+token);
   try{
     const data = jwt.verify(token, process.env.TOKEN_SECRET);
     const { id, login } = data;
