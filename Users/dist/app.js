@@ -17,7 +17,7 @@ var _token = require('./routes/token'); var _token2 = _interopRequireDefault(_to
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://4school.netlify.app'
+  'https://54.94.70.35'
 ]
 
 const corsOptions = {
@@ -38,7 +38,7 @@ class App {
   }
 
   middlewares() {
-   // this.app.use(cors(corsOptions));
+    this.app.use(_cors2.default.call(void 0, corsOptions));
     this.app.use(_helmet2.default.call(void 0, ));
     this.app.use(_express2.default.urlencoded({ extended: true }));
     this.app.use(_express2.default.json());

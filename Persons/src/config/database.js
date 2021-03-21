@@ -17,5 +17,5 @@ module.exports = {
   dialectOptions: {
     timezone: 'local',
   },
-  timezone: 'America/Recife',
+  timezone: '+00:00',
 };

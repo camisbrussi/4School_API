@@ -15,7 +15,7 @@ var _activity = require('./routes/activity'); var _activity2 = _interopRequireDe
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://4school.netlify.app'
+  'https://54.94.70.35'
 ]
 
 const corsOptions = {
