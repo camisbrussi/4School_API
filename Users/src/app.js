@@ -17,7 +17,8 @@ import tokenRoutes from "./routes/token";
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://177.44.248.32:8080'
+  'http://177.44.248.32:8080',
+  'http://177.44.248.32:8081'
 ]
 
 const corsOptions = {

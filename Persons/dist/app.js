@@ -16,7 +16,8 @@ var _teacher = require('./routes/teacher'); var _teacher2 = _interopRequireDefau
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://177.44.248.32:8080'
+  'http://177.44.248.32:8080',
+  'http://177.44.248.32:8084'
 ]
 
 const corsOptions = {

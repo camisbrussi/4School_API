@@ -15,7 +15,8 @@ var _activity = require('./routes/activity'); var _activity2 = _interopRequireDe
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://177.44.248.32:8080'
+  'http://177.44.248.32:8080',
+  'http://177.44.248.32:8082'
 ]
 
 const corsOptions = {
