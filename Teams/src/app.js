@@ -9,7 +9,8 @@ import cors from 'cors';
 import helmet from 'helmet'
 
 
-import activityRoutes from "./routes/activity";
+import teamRoutes from "./routes/team";
+
 
 
 const whiteList = [
@@ -44,7 +45,7 @@ class App {
   }
 
   routes() {
-    this.app.use("/activities/", activityRoutes);
+    this.app.use("/teams/", teamRoutes);
   }
 }
 

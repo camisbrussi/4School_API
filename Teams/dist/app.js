@@ -9,8 +9,8 @@ var _cors = require('cors'); var _cors2 = _interopRequireDefault(_cors);
 var _helmet = require('helmet'); var _helmet2 = _interopRequireDefault(_helmet);
 
 
-var _person = require('./routes/person'); var _person2 = _interopRequireDefault(_person);
-var _teacher = require('./routes/teacher'); var _teacher2 = _interopRequireDefault(_teacher);
+var _team = require('./routes/team'); var _team2 = _interopRequireDefault(_team);
+
 
 
 const whiteList = [
@@ -45,8 +45,7 @@ class App {
   }
 
   routes() {
-    this.app.use("/persons/", _person2.default);
-    this.app.use("/teachers/", _teacher2.default);
+    this.app.use("/teams/", _team2.default);
   }
 }
 
