@@ -17,7 +17,7 @@ const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',
   'http://177.44.248.32:8080',
-  'http://177.44.248.32:8084'
+  'http://177.44.248.32:8083'
 ]
 
 const corsOptions = {
