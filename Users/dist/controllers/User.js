@@ -24,7 +24,11 @@ class UserController {
   }
   async index(req, res) {
     try {
-      const users = await _user2.default.findAll();
+      const users = await _user2.default.findAll({
+        order: [
+          "status_id",
+        ]
+      });
       
       return res.json(users);
     } catch (e) {

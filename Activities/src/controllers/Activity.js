@@ -31,7 +31,11 @@ class ActivityController {
   async index(req, res) {
     const activities = await Activity.findAll({
       attributes: ["id", "name", "start", "end", "status_id"],
-      order: ["name"],
+      order: [
+        "status_id",
+        ["start", "desc"],
+        ["name", "asc"]
+    ]
     });
     res.json(activities);
   }

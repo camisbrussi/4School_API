@@ -22,7 +22,7 @@ class TeamController {
 
   async index(req, res) {
     const teams = await Team.findAll({
-      attributes: ["id", "name", "year"],
+      attributes: ["id", "name", "year", "status_id"],
       include: [
         {
             model: Teacher,
@@ -35,7 +35,10 @@ class TeamController {
                   attributes: ["name"]
               }]
         }],
-        order: ["name"]
+        order: [
+          "status_id",
+          ["name", "asc"]
+      ]
     });
     res.json(teams);
   }
