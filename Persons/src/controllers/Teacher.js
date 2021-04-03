@@ -84,7 +84,7 @@ class TeacherController {
             }
 
             const teacher = await Teacher.findByPk(id, {
-                attributes: ["id"],
+                attributes: ["id", "status_id"],
                 include: [
                     {
                         model: Person,

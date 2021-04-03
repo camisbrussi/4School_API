@@ -53,7 +53,7 @@ class TeamController {
       }
 
       const team = await Team.findByPk(id, {
-        attributes: ["id", "name", "year"],
+        attributes: ["id", "name", "year", "status_id"],
         include: [
         {
             model: Teacher,
