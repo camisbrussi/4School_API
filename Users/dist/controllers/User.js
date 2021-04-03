@@ -40,7 +40,6 @@ class UserController {
     try {
       const user = await _user2.default.findByPk(req.params.id);
 
-      
       return res.json(user);
     } catch (e) {
       return res.json(null);
@@ -48,6 +47,7 @@ class UserController {
   }
 
   async update(req, res) {
+
     try {
       const { id } = req.params;
 
@@ -65,10 +65,13 @@ class UserController {
         });
       }
 
-      const { name, login, password} = req.body;
+      const { name, login, password, status_id } = req.body;
+      
+
       
       if(password) await user.update(req.body);
       else { await user.update({
+          status_id,
           name,
           login,
         });
