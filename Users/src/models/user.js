@@ -41,7 +41,7 @@ export default class user extends Model {
           defaultValue: "",
           validate: {
             len: {
-              args: [6, 45],
+              args: [6, 50],
               msg: "Password must be between 6 and 50 characters",
             },
           },
