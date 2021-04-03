@@ -12,13 +12,13 @@ import Phone from "../models/phone";
 class TeacherController {
     async store(req, res) {
         try {
-            const {name, cpf, email, birth_date, phones} = req.body;
+            const {name, cpf, email, birth_date, phones, password} = req.body;
             const type_id = process.env.TEACHER_PERSON_TYPE;
             const status_id = process.env.TEACHER_STATUS_ACTIVE;
 
             const person = await Person.create({type_id, name, cpf, email, birth_date});
             const person_id = person.id;
-            await Teacher.create({person_id, status_id});
+            await Teacher.create({person_id, status_id, password});
 
             if (phones) {
                 phones.map((v, k) => {
@@ -146,9 +146,12 @@ class TeacherController {
                 });
             }
 
-            const {status_id, name, cpf, email, birth_date, phones} = req.body;
+            const {status_id, name, cpf, email, birth_date, phones, password} = req.body;
             if (status_id) {
                 await teacher.update({status_id});
+            }
+            if (password) {
+                await teacher.update({password});
             }
             await person.update({name, cpf, email, birth_date});
 

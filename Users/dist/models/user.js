@@ -41,7 +41,7 @@ var _bcryptjs = require('bcryptjs'); var _bcryptjs2 = _interopRequireDefault(_bc
           defaultValue: "",
           validate: {
             len: {
-              args: [6, 45],
+              args: [6, 50],
               msg: "Password must be between 6 and 50 characters",
             },
           },
