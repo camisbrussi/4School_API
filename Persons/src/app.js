@@ -11,6 +11,8 @@ import helmet from 'helmet'
 
 import personRoutes from "./routes/person";
 import teacherRoutes from "./routes/teacher";
+import responsibleRoutes from "./routes/responsible";
+import studentRoutes from "./routes/student";
 
 
 const whiteList = [
@@ -48,6 +50,8 @@ class App {
   routes() {
     this.app.use("/persons/", personRoutes);
     this.app.use("/teachers/", teacherRoutes);
+    this.app.use("/responsibles/", responsibleRoutes);
+    this.app.use("/students/", studentRoutes);
   }
 }
 

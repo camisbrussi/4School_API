@@ -11,6 +11,8 @@ var _helmet = require('helmet'); var _helmet2 = _interopRequireDefault(_helmet);
 
 var _person = require('./routes/person'); var _person2 = _interopRequireDefault(_person);
 var _teacher = require('./routes/teacher'); var _teacher2 = _interopRequireDefault(_teacher);
+var _responsible = require('./routes/responsible'); var _responsible2 = _interopRequireDefault(_responsible);
+var _student = require('./routes/student'); var _student2 = _interopRequireDefault(_student);
 
 
 const whiteList = [
@@ -48,6 +50,8 @@ class App {
   routes() {
     this.app.use("/persons/", _person2.default);
     this.app.use("/teachers/", _teacher2.default);
+    this.app.use("/responsibles/", _responsible2.default);
+    this.app.use("/students/", _student2.default);
   }
 }
 

@@ -5,8 +5,11 @@ var _person_type = require('../models/person_type'); var _person_type2 = _intero
 var _teacher = require('../models/teacher'); var _teacher2 = _interopRequireDefault(_teacher);
 var _teacher_status = require('../models/teacher_status'); var _teacher_status2 = _interopRequireDefault(_teacher_status);
 var _phone = require('../models/phone'); var _phone2 = _interopRequireDefault(_phone);
+var _responsible = require('../models/responsible'); var _responsible2 = _interopRequireDefault(_responsible);
+var _student = require('../models/student'); var _student2 = _interopRequireDefault(_student);
+var _student_status = require('../models/student_status'); var _student_status2 = _interopRequireDefault(_student_status);
 
-const models = [_person2.default, _person_type2.default, _teacher2.default, _teacher_status2.default, _phone2.default];
+const models = [_person2.default, _person_type2.default, _teacher2.default, _teacher_status2.default, _phone2.default, _responsible2.default, _student2.default, _student_status2.default];
 const connection = new (0, _sequelize2.default)(_database2.default);
 
 models.forEach(model => model.init(connection));
