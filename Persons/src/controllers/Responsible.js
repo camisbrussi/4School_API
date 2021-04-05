@@ -17,7 +17,7 @@ class ResponsibleController {
 
             const person = await Person.create({type_id, name, cpf, email, birth_date});
             const person_id = person.id;
-            await Responsible.create({person_id, password},{logging: console.log});
+            const responsible = await Responsible.create({person_id, password},{logging: console.log});
 
             if (phones) {
                 phones.map((v, k) => {
@@ -26,7 +26,7 @@ class ResponsibleController {
                 });
             }
 
-            return res.json({success: 'Registrado com sucesso'});
+            return res.json({success: 'Registrado com sucesso', responsible_id: responsible.id});
         } catch (e) {
             console.log(e)
             return res.status(400).json({
