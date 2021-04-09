@@ -13,7 +13,6 @@ import helmet from 'helmet'
 import userRoutes from "./routes/user";
 import tokenRoutes from "./routes/token";
 
-
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',

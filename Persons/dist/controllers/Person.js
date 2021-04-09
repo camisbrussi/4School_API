@@ -1,15 +1,17 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _person = require('../models/person'); var _person2 = _interopRequireDefault(_person);
+var _logger = require('../logger'); var _logger2 = _interopRequireDefault(_logger);
 
 class PersonController {
   async store(req, res) {
     try {
-      const {type, name, cpf, email, birth_date} = req.body;
+      const { type, name, cpf, email, birth_date } = req.body;
 
-      await _person2.default.create({type, name, cpf, email, birth_date});
+      await _person2.default.create({ type, name, cpf, email, birth_date });
 
-      return res.json({success:'Registrado com sucesso'});
+      _logger2.default.info({ success: "Pessoa registrada com sucesso" });
+      return res.json({ success: "Pessoa registrada com sucesso" });
     } catch (e) {
-      console.log(e)
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -41,6 +43,7 @@ class PersonController {
       }
       return res.json(person);
     } catch (e) {
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -65,10 +68,10 @@ class PersonController {
       }
 
       await person.update(req.body);
-      return res.json({success:'Editado com sucesso'});
-
+      _logger2.default.info({ success: "Pessoa editada com sucesso" });
+      return res.json({ success: "Editado com sucesso" });
     } catch (e) {
-      console.log(e)
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -77,8 +80,9 @@ class PersonController {
 
   async delete(req, res) {
     try {
-      return res.json('Person connot be inactivated');
+      return res.json("Pessoa não pode ser inativa");
     } catch (e) {
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

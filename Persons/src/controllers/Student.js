@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import Logger from "../logger";
 
 require('dotenv').config();
 dotenv.config();
@@ -27,10 +28,10 @@ class StudentController {
                     Phone.create({person_id, number, is_whatsapp});
                 });
             }
-
+            Logger.info({ success: "Estudante registrado com sucesso" });
             return res.json({success: 'Registrado com sucesso'});
         } catch (e) {
-            console.log(e)
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -93,7 +94,7 @@ class StudentController {
 
             res.json(students);
         } catch (e) {
-            console.log(e);
+            Logger.error(e.errors.map((err) => err.message));
         }
     }
 
@@ -160,7 +161,7 @@ class StudentController {
             }
             return res.json(student);
         } catch (e) {
-            console.log(e);
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -186,6 +187,7 @@ class StudentController {
 
             const person = await Person.findByPk(student.person_id);
             if (!person) {
+                Logger.error(e.errors.map((err) => err.message));
                 return res.status(400).json({
                     errors: ["Person does not exist"]
                 });
@@ -208,10 +210,10 @@ class StudentController {
                     Phone.create({"person_id":person.id, number, is_whatsapp});
                 });
             }
-
+            Logger.info({ success: "Estudante editado com sucesso" });
             return res.json({success: 'Editado com sucesso'});
         } catch (e) {
-            console.log(e)
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -235,8 +237,10 @@ class StudentController {
                 });
             }
             await student.update({status_id: process.env.STUDENT_STATUS_INACTIVE});
+            Logger.info({ success: "Estudante Inativo" });
             return res.json('Student inactive');
         } catch (e) {
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });

@@ -1,6 +1,7 @@
 import Team from "../models/team";
 import Teacher from "../models/teacher";
 import Person from "../models/person";
+import Logger from "../logger";
 
 class TeamController {
   async store(req, res) {
@@ -11,9 +12,10 @@ class TeamController {
       
       await Team.create({teacher_id, status_id, name, year});
 
+      Logger.info({ success: "Turma registrada com sucesso" });
       return res.json({success:'Registrado com sucesso'});
     } catch (e) {
-      console.log(e)
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -75,6 +77,7 @@ class TeamController {
       }
       return res.json(team);
     } catch (e) {
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -99,10 +102,11 @@ class TeamController {
       }
 
       await team.update(req.body);
+      Logger.info({ success: "Turma editada com sucesso" });
       return res.json({success:'Editado com sucesso'});
 
     } catch (e) {
-      console.log(e)
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -128,6 +132,7 @@ class TeamController {
         await team.update({status_id: 2});
         return res.json('Team inactive');
     } catch (e) {
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

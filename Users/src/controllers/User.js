@@ -1,4 +1,5 @@
 import User from "../models/user";
+import Logger from "../logger";
 
 class UserController {
   async store(req, res) {
@@ -8,16 +9,17 @@ class UserController {
       const status_id = 1;
       await User.create({
         name,
-        login, 
+        login,
         password,
-        status_id
+        status_id,
       });
-      
-      return res.json({success:'Registrado com sucesso'});
+
+      Logger.info({ success: "Usuário registrado com sucesso" });
+
+      return res.json({ success: "Usuário registrado com sucesso" });
     } catch (e) {
-      console.log(e)
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
-        
         errors: e.errors.map((err) => err.message),
       });
     }
@@ -25,13 +27,12 @@ class UserController {
   async index(req, res) {
     try {
       const users = await User.findAll({
-        order: [
-          "status_id",
-        ]
+        order: ["status_id"],
       });
-      
+      Logger.info({ success: "Usuário registrado com sucesso" });
       return res.json(users);
     } catch (e) {
+      Logger.error(e.errors.map((err) => err.message));
       return res.json(null);
     }
   }
@@ -39,15 +40,14 @@ class UserController {
   async show(req, res) {
     try {
       const user = await User.findByPk(req.params.id);
-
       return res.json(user);
     } catch (e) {
+      Logger.error(e.errors.map((err) => err.message));
       return res.json(null);
     }
   }
 
   async update(req, res) {
-
     try {
       const { id } = req.params;
 
@@ -59,28 +59,25 @@ class UserController {
       const user = await User.findByPk(id);
 
       if (!user) {
-        
         return res.status(400).json({
           errors: ["User does not exist"],
         });
       }
 
       const { name, login, password, status_id } = req.body;
-      
 
-      
-      if(password) await user.update(req.body);
-      else { await user.update({
+      if (password) await user.update(req.body);
+      else {
+        await user.update({
           status_id,
           name,
           login,
         });
       }
-      
-      return res.json({success:'Editado com sucesso'});
-
+      Logger.info({ success: "Usuário registrado com sucesso" });
+      return res.json({ success: "Usuário registrado com sucesso" });
     } catch (e) {
-      console.log(e)
+      Logger.error(e.errors.map((err) => err.message))
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -102,9 +99,11 @@ class UserController {
           errors: ["User does not exist"],
         });
       }
-      await user.update({status_id: 2});
-      return res.json('User inactive');
+      await user.update({ status_id: 2 });
+      Logger.info({ success: "Usuário inativo" });
+      return res.json({success: "Usuário inativo"});
     } catch (e) {
+      Logger.error(e.errors.map((err) => err.message))
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

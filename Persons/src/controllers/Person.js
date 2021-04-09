@@ -1,15 +1,17 @@
 import Person from "../models/person";
+import Logger from "../logger";
 
 class PersonController {
   async store(req, res) {
     try {
-      const {type, name, cpf, email, birth_date} = req.body;
+      const { type, name, cpf, email, birth_date } = req.body;
 
-      await Person.create({type, name, cpf, email, birth_date});
+      await Person.create({ type, name, cpf, email, birth_date });
 
-      return res.json({success:'Registrado com sucesso'});
+      Logger.info({ success: "Pessoa registrada com sucesso" });
+      return res.json({ success: "Pessoa registrada com sucesso" });
     } catch (e) {
-      console.log(e)
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -41,6 +43,7 @@ class PersonController {
       }
       return res.json(person);
     } catch (e) {
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -65,10 +68,10 @@ class PersonController {
       }
 
       await person.update(req.body);
-      return res.json({success:'Editado com sucesso'});
-
+      Logger.info({ success: "Pessoa editada com sucesso" });
+      return res.json({ success: "Editado com sucesso" });
     } catch (e) {
-      console.log(e)
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -77,8 +80,9 @@ class PersonController {
 
   async delete(req, res) {
     try {
-      return res.json('Person connot be inactivated');
+      return res.json("Pessoa não pode ser inativa");
     } catch (e) {
+      Logger.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

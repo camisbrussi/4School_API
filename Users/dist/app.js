@@ -13,7 +13,6 @@ var _helmet = require('helmet'); var _helmet2 = _interopRequireDefault(_helmet);
 var _user = require('./routes/user'); var _user2 = _interopRequireDefault(_user);
 var _token = require('./routes/token'); var _token2 = _interopRequireDefault(_token);
 
-
 const whiteList = [
   'http://localhost:3000',
   'http://localhost:3001',

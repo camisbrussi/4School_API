@@ -1,0 +1,6 @@
+{"message":["user.login must be unique"],"level":"error"}
+{"message":["user.login must be unique"],"level":"error"}
+{"message":"Usuário registrado com sucesso","level":"info"}
+{"message":["Login field must be between 3 and 255 characters"],"level":"error"}
+{"message":{"success":"Usuário registrado com sucesso"},"level":"info"}
+{"message":{"success":"Usuário registrado com sucesso"},"level":"info"}

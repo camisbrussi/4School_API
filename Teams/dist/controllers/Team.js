@@ -1,6 +1,7 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _team = require('../models/team'); var _team2 = _interopRequireDefault(_team);
 var _teacher = require('../models/teacher'); var _teacher2 = _interopRequireDefault(_teacher);
 var _person = require('../models/person'); var _person2 = _interopRequireDefault(_person);
+var _logger = require('../logger'); var _logger2 = _interopRequireDefault(_logger);
 
 class TeamController {
   async store(req, res) {
@@ -11,9 +12,10 @@ class TeamController {
       
       await _team2.default.create({teacher_id, status_id, name, year});
 
+      _logger2.default.info({ success: "Turma registrada com sucesso" });
       return res.json({success:'Registrado com sucesso'});
     } catch (e) {
-      console.log(e)
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -75,6 +77,7 @@ class TeamController {
       }
       return res.json(team);
     } catch (e) {
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -99,10 +102,11 @@ class TeamController {
       }
 
       await team.update(req.body);
+      _logger2.default.info({ success: "Turma editada com sucesso" });
       return res.json({success:'Editado com sucesso'});
 
     } catch (e) {
-      console.log(e)
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -128,6 +132,7 @@ class TeamController {
         await team.update({status_id: 2});
         return res.json('Team inactive');
     } catch (e) {
+      _logger2.default.error(e.errors.map((err) => err.message));
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

@@ -8,26 +8,26 @@ class TokenController {
 
     if (!login || !password) {
       return res.status(401).json({
-        errors: ["Invalid credentials"],
+        errors: ["Credenciais inválidas"],
       });
     }
     const user = await User.findOne({ where: { login } });
 
     if (!login || user.status_id === 2 || user.status_id === 3) {
       return res.status(401).json({
-        errors: ["Invalid credentials"],
+        errors: ["Credenciais inválidas"],
       });
     }
 
     if (!(await user.passwordIsValid(password))) {
       return res.status(401).json({
-        errors: ["Invalid credentials"],
+        errors: ["Credenciais inválidas"],
       });
     }
 
     if (user.id_status === 3) {
       return res.status(401).json({
-        errors: ["User blocked"],
+        errors: ["Usuário Bloqueado"],
       });
     }
 
@@ -40,9 +40,6 @@ class TokenController {
   }
 
   async validate(req, res) {
-   
-
-
     return res.json({success:'Token Válido'});
   }
 }

@@ -1,4 +1,5 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _dotenv = require('dotenv'); var _dotenv2 = _interopRequireDefault(_dotenv);
+var _logger = require('../logger'); var _logger2 = _interopRequireDefault(_logger);
 
 require('dotenv').config();
 _dotenv2.default.config();
@@ -26,10 +27,10 @@ class TeacherController {
                     _phone2.default.create({person_id, number, is_whatsapp});
                 });
             }
-
+            _logger2.default.info({ success: "Professor registrado com sucesso" });
             return res.json({success: 'Registrado com sucesso'});
         } catch (e) {
-            console.log(e)
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -70,7 +71,7 @@ class TeacherController {
 
             res.json(teachers);
         } catch (e) {
-            console.log(e);
+            _logger2.default.error(e.errors.map((err) => err.message));
         }
     }
 
@@ -115,7 +116,7 @@ class TeacherController {
             }
             return res.json(teacher);
         } catch (e) {
-            console.log(e);
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -165,10 +166,10 @@ class TeacherController {
                     _phone2.default.create({"person_id":person.id, number, is_whatsapp});
                 });
             }
-
+            _logger2.default.info({ success: "Professor editado com sucesso" });
             return res.json({success: 'Editado com sucesso'});
         } catch (e) {
-            console.log(e)
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -192,8 +193,10 @@ class TeacherController {
                 });
             }
             await teacher.update({status_id: process.env.TEACHER_STATUS_INACTIVE});
+            _logger2.default.info({ success: "Professor inativo" });
             return res.json('Teacher inactive');
         } catch (e) {
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });

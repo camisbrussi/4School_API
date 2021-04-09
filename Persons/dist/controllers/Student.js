@@ -1,4 +1,5 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _dotenv = require('dotenv'); var _dotenv2 = _interopRequireDefault(_dotenv);
+var _logger = require('../logger'); var _logger2 = _interopRequireDefault(_logger);
 
 require('dotenv').config();
 _dotenv2.default.config();
@@ -27,10 +28,10 @@ class StudentController {
                     _phone2.default.create({person_id, number, is_whatsapp});
                 });
             }
-
+            _logger2.default.info({ success: "Estudante registrado com sucesso" });
             return res.json({success: 'Registrado com sucesso'});
         } catch (e) {
-            console.log(e)
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -93,7 +94,7 @@ class StudentController {
 
             res.json(students);
         } catch (e) {
-            console.log(e);
+            _logger2.default.error(e.errors.map((err) => err.message));
         }
     }
 
@@ -160,7 +161,7 @@ class StudentController {
             }
             return res.json(student);
         } catch (e) {
-            console.log(e);
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -186,6 +187,7 @@ class StudentController {
 
             const person = await _person2.default.findByPk(student.person_id);
             if (!person) {
+                _logger2.default.error(e.errors.map((err) => err.message));
                 return res.status(400).json({
                     errors: ["Person does not exist"]
                 });
@@ -208,10 +210,10 @@ class StudentController {
                     _phone2.default.create({"person_id":person.id, number, is_whatsapp});
                 });
             }
-
+            _logger2.default.info({ success: "Estudante editado com sucesso" });
             return res.json({success: 'Editado com sucesso'});
         } catch (e) {
-            console.log(e)
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -235,8 +237,10 @@ class StudentController {
                 });
             }
             await student.update({status_id: process.env.STUDENT_STATUS_INACTIVE});
+            _logger2.default.info({ success: "Estudante Inativo" });
             return res.json('Student inactive');
         } catch (e) {
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });

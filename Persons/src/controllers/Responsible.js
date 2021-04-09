@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import Logger from "../logger";
 
 require('dotenv').config();
 dotenv.config();
@@ -25,10 +26,10 @@ class ResponsibleController {
                     Phone.create({person_id, number, is_whatsapp});
                 });
             }
-
+            Logger.info({ success: "Responsável registrado com sucesso" });
             return res.json({success: 'Registrado com sucesso', responsible_id: responsible.id});
         } catch (e) {
-            console.log(e)
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -64,7 +65,7 @@ class ResponsibleController {
 
             res.json(responsibles);
         } catch (e) {
-            console.log(e);
+            Logger.error(e.errors.map((err) => err.message));
         }
     }
 
@@ -105,7 +106,7 @@ class ResponsibleController {
             }
             return res.json(responsible);
         } catch (e) {
-            console.log(e);
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -153,10 +154,10 @@ class ResponsibleController {
                     Phone.create({"person_id":person.id, number, is_whatsapp});
                 });
             }
-
+            Logger.info({ success: "Responsável editado com sucesso" });
             return res.json({success: 'Editado com sucesso'});
         } catch (e) {
-            console.log(e)
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });

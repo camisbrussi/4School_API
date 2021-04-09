@@ -1,4 +1,5 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _dotenv = require('dotenv'); var _dotenv2 = _interopRequireDefault(_dotenv);
+var _logger = require('../logger'); var _logger2 = _interopRequireDefault(_logger);
 
 require('dotenv').config();
 _dotenv2.default.config();
@@ -25,10 +26,10 @@ class ResponsibleController {
                     _phone2.default.create({person_id, number, is_whatsapp});
                 });
             }
-
+            _logger2.default.info({ success: "Responsável registrado com sucesso" });
             return res.json({success: 'Registrado com sucesso', responsible_id: responsible.id});
         } catch (e) {
-            console.log(e)
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -64,7 +65,7 @@ class ResponsibleController {
 
             res.json(responsibles);
         } catch (e) {
-            console.log(e);
+            _logger2.default.error(e.errors.map((err) => err.message));
         }
     }
 
@@ -105,7 +106,7 @@ class ResponsibleController {
             }
             return res.json(responsible);
         } catch (e) {
-            console.log(e);
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -153,10 +154,10 @@ class ResponsibleController {
                     _phone2.default.create({"person_id":person.id, number, is_whatsapp});
                 });
             }
-
+            _logger2.default.info({ success: "Responsável editado com sucesso" });
             return res.json({success: 'Editado com sucesso'});
         } catch (e) {
-            console.log(e)
+            _logger2.default.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });

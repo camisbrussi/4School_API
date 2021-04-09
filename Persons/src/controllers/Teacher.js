@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import Logger from "../logger";
 
 require('dotenv').config();
 dotenv.config();
@@ -26,10 +27,10 @@ class TeacherController {
                     Phone.create({person_id, number, is_whatsapp});
                 });
             }
-
+            Logger.info({ success: "Professor registrado com sucesso" });
             return res.json({success: 'Registrado com sucesso'});
         } catch (e) {
-            console.log(e)
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -70,7 +71,7 @@ class TeacherController {
 
             res.json(teachers);
         } catch (e) {
-            console.log(e);
+            Logger.error(e.errors.map((err) => err.message));
         }
     }
 
@@ -115,7 +116,7 @@ class TeacherController {
             }
             return res.json(teacher);
         } catch (e) {
-            console.log(e);
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -165,10 +166,10 @@ class TeacherController {
                     Phone.create({"person_id":person.id, number, is_whatsapp});
                 });
             }
-
+            Logger.info({ success: "Professor editado com sucesso" });
             return res.json({success: 'Editado com sucesso'});
         } catch (e) {
-            console.log(e)
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
@@ -192,8 +193,10 @@ class TeacherController {
                 });
             }
             await teacher.update({status_id: process.env.TEACHER_STATUS_INACTIVE});
+            Logger.info({ success: "Professor inativo" });
             return res.json('Teacher inactive');
         } catch (e) {
+            Logger.error(e.errors.map((err) => err.message));
             return res.status(400).json({
                 errors: e.errors.map((err) => err.message),
             });
