@@ -193,12 +193,13 @@ class StudentController {
                 });
             }
 
-            const {status_id, name, cpf, email, birth_date, phones} = req.body;
+            let {status_id, name, cpf, email, birth_date, phones, isActive} = req.body;
             await person.update({name, cpf, email, birth_date});
 
-            if (status_id) {
+            if (isActive !== undefined)
+                status_id = isActive === true ? process.env.STUDENT_STATUS_ACTIVE : process.env.STUDENT_STATUS_INACTIVE;
+            if (status_id)
                 await student.update({status_id});
-            }
 
             await Phone.destroy({
                 where: { "person_id":person.id }
