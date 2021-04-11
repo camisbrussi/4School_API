@@ -7,6 +7,7 @@ const router = new (0, _express.Router)();
 
 router.get("/:id", _loginRequired2.default, _Student2.default.show);
 router.get("/", _loginRequired2.default, _Student2.default.index);
+router.get("/responsible/:responsible_id", _loginRequired2.default, _Student2.default.indexResponsible);
 router.post("/", _loginRequired2.default, _Student2.default.store);
 router.put("/:id", _loginRequired2.default, _Student2.default.update);
 router.delete("/:id", _loginRequired2.default, _Student2.default.delete);

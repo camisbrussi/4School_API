@@ -98,6 +98,74 @@ class StudentController {
         }
     }
 
+    async indexResponsible(req, res) {
+        try {
+            const {responsible_id} = req.params;
+            if (!responsible_id) {
+                return res.status(400).json({
+                    errors: ["Missing Responsible ID"],
+                });
+            }
+
+            const students = await Student.findAll({
+                attributes: ["id"],
+                where: {responsible_id},
+                include: [
+                    {
+                        model: Person,
+                        as: "person",
+                        attributes: ["id", "name", "cpf", "email", "birth_date"],
+                        include: [
+                            {
+                                model: PersonType,
+                                as: "type",
+                                attributes: ["id", "description"]
+                            }, {
+                                model: Phone,
+                                as: "phones",
+                                attributes: ["id", "number", "is_whatsapp"]
+                            }
+                        ]
+                    },{
+                        model: Responsible,
+                        as: "responsible",
+                        attributes: ["id"],
+                        include: [
+                            {
+                                model: Person,
+                                as: "person",
+                                attributes: ["id", "name", "cpf", "email", "birth_date"],
+                                include: [
+                                    {
+                                        model: PersonType,
+                                        as: "type",
+                                        attributes: ["id", "description"]
+                                    }, {
+                                        model: Phone,
+                                        as: "phones",
+                                        attributes: ["id", "number", "is_whatsapp"]
+                                    }
+                                ]
+                            }
+                        ]
+                    },{
+                        model: StudentStatus,
+                        as: "status",
+                        attributes: ["id", "description"]
+                    }
+                ],
+                order: [
+                    "status_id",
+                    [Person, "name", "asc"]
+                ]
+            });
+
+            res.json(students);
+        } catch (e) {
+            Logger.error(e.errors.map((err) => err.message));
+        }
+    }
+
     async show(req, res) {
         try {
             const {id} = req.params;

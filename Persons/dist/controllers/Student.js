@@ -98,6 +98,74 @@ class StudentController {
         }
     }
 
+    async indexResponsible(req, res) {
+        try {
+            const {responsible_id} = req.params;
+            if (!responsible_id) {
+                return res.status(400).json({
+                    errors: ["Missing Responsible ID"],
+                });
+            }
+
+            const students = await _student2.default.findAll({
+                attributes: ["id"],
+                where: {responsible_id},
+                include: [
+                    {
+                        model: _person2.default,
+                        as: "person",
+                        attributes: ["id", "name", "cpf", "email", "birth_date"],
+                        include: [
+                            {
+                                model: _person_type2.default,
+                                as: "type",
+                                attributes: ["id", "description"]
+                            }, {
+                                model: _phone2.default,
+                                as: "phones",
+                                attributes: ["id", "number", "is_whatsapp"]
+                            }
+                        ]
+                    },{
+                        model: _responsible2.default,
+                        as: "responsible",
+                        attributes: ["id"],
+                        include: [
+                            {
+                                model: _person2.default,
+                                as: "person",
+                                attributes: ["id", "name", "cpf", "email", "birth_date"],
+                                include: [
+                                    {
+                                        model: _person_type2.default,
+                                        as: "type",
+                                        attributes: ["id", "description"]
+                                    }, {
+                                        model: _phone2.default,
+                                        as: "phones",
+                                        attributes: ["id", "number", "is_whatsapp"]
+                                    }
+                                ]
+                            }
+                        ]
+                    },{
+                        model: _student_status2.default,
+                        as: "status",
+                        attributes: ["id", "description"]
+                    }
+                ],
+                order: [
+                    "status_id",
+                    [_person2.default, "name", "asc"]
+                ]
+            });
+
+            res.json(students);
+        } catch (e) {
+            _logger2.default.error(e.errors.map((err) => err.message));
+        }
+    }
+
     async show(req, res) {
         try {
             const {id} = req.params;
