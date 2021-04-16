@@ -16,3 +16,7 @@
 {"message":{"success":"Estudante editado com sucesso"},"level":"info"}
 {"message":{"success":"Estudante editado com sucesso"},"level":"info"}
 {"message":{"success":"Estudante editado com sucesso"},"level":"info"}
+{"message":{"success":"Responsável registrado com sucesso"},"level":"info"}
+{"message":["CPF field must be 11 characters"],"level":"error"}
+{"message":{"success":"Estudante registrado com sucesso"},"level":"info"}
+{"message":{"success":"Estudante registrado com sucesso"},"level":"info"}

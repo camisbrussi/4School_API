@@ -17,7 +17,7 @@ var _student = require('./routes/student'); var _student2 = _interopRequireDefau
 
 const whiteList = [
   'http://localhost:3000',
-  'http://localhost:3001',
+  'http://localhost:3003',
   'http://177.44.248.32:8080',
   'http://177.44.248.32:8083'
 ]
