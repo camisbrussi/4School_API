@@ -15,8 +15,8 @@ const logger = _winston.createLogger.call(void 0, {
         myFormat
       ),
     transports: [
-        new _winston.transports.File({ filename: `../error/${date}.log`, level: 'error' }),
-        new _winston.transports.File({ filename: `../info/${date}.log`, level: 'info' }),
+        new _winston.transports.File({ filename: `../Logs/error/${date}.log`, level: 'error' }),
+        new _winston.transports.File({ filename: `../Logs/info/${date}.log`, level: 'info' }),
     ],
 });
  
