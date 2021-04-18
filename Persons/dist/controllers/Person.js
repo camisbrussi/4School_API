@@ -3,15 +3,26 @@ var _logger = require('../logger'); var _logger2 = _interopRequireDefault(_logge
 
 class PersonController {
   async store(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const { type, name, cpf, email, birth_date } = req.body;
 
-      await _person2.default.create({ type, name, cpf, email, birth_date });
+      const newPerson = await _person2.default.create({ type, name, cpf, email, birth_date });
 
-      _logger2.default.info({ success: "Pessoa registrada com sucesso" });
+      _logger2.default.info({
+        level: "info",
+        message: `Pessoa id: ${newPerson.id} login: ${newPerson.name} registrada com sucesso`,
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({ success: "Pessoa registrada com sucesso" });
     } catch (e) {
-      _logger2.default.error(e.errors.map((err) => err.message));
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -27,6 +38,8 @@ class PersonController {
   }
 
   async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
       if (!id) {
@@ -43,7 +56,12 @@ class PersonController {
       }
       return res.json(person);
     } catch (e) {
-      _logger2.default.error(e.errors.map((err) => err.message));
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -51,6 +69,8 @@ class PersonController {
   }
 
   async update(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
 
@@ -67,11 +87,22 @@ class PersonController {
         });
       }
 
-      await person.update(req.body);
-      _logger2.default.info({ success: "Pessoa editada com sucesso" });
+      const newData = await person.update(req.body);
+
+      _logger2.default.info({
+        level: "info",
+        message: `Pessoa id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({ success: "Editado com sucesso" });
     } catch (e) {
-      _logger2.default.error(e.errors.map((err) => err.message));
+        _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+      
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -82,7 +113,11 @@ class PersonController {
     try {
       return res.json("Pessoa não pode ser inativa");
     } catch (e) {
-      _logger2.default.error(e.errors.map((err) => err.message));
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+      });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

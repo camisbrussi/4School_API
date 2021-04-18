@@ -1,8 +1,9 @@
 import Activity from "../models/activity";
-import Logger from "../logger";
+import logger from "../logger";
 
 class ActivityController {
   async store(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const {
         name,
@@ -15,7 +16,7 @@ class ActivityController {
       
       const status_id = 1;
 
-      await Activity.create({
+      const newActivity = await Activity.create({
         name,
         description,
         start,
@@ -24,10 +25,22 @@ class ActivityController {
         vacancies,
         status_id,
       });
-      Logger.info({ success: "Atividade registrada com sucesso" });
+      
+      logger.info({
+        level: "info",
+        message: `Atividade id: ${newActivity.id} login: ${newActivity.name} registrada com sucesso`,
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({ success: "Atividade Registrada com sucesso" });
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -35,6 +48,7 @@ class ActivityController {
   }
 
   async index(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     const activities = await Activity.findAll({
       attributes: ["id", "name", "start", "end", "status_id"],
       order: ["status_id", ["start", "desc"], ["name", "asc"]],
@@ -43,6 +57,7 @@ class ActivityController {
   }
 
   async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
       if (!id) {
@@ -57,15 +72,21 @@ class ActivityController {
           errors: ["Activity does not exist"],
         });
       }
+
       return res.json(activity);
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `${iduserlogged}, ${userlogged}`,
+      });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
     }
   }
   async update(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
 
@@ -82,17 +103,31 @@ class ActivityController {
         });
       }
 
-      await activity.update(req.body);
-      Logger.info({ success: "Atividade editada com sucesso" });
+      const newActivity = await activity.update(req.body);
+
+      logger.info({
+        level: "info",
+        message: `Atividade id: ${activity.id}, nome: ${activity.name}, inicio ${activity.start}, fim ${activity.end}, vagas ${activity.vacancies}, certificado ${activity.generate_certificate} - (nome: ${newActivity.name}, inicio ${newActivity.start}, fim ${newActivity.end}, vagas ${newActivity.vacancies}, certificado ${newActivity.generate_certificate})`,
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
+
       return res.json({ success: "Editado com sucesso" });
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
     }
   }
+
   async delete(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
 
@@ -109,10 +144,21 @@ class ActivityController {
         });
       }
       await activity.update({ status_id: 2 });
-      Logger.info({ success: "Atividade inativa" });
+      
+      logger.info({
+        level: "info",
+        message: `Atividade inativada com sucesso ${activity.name}`,
+        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({ success: "Atividade inativa" });
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

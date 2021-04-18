@@ -1,13 +1,22 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true});var _winston = require('winston');
+const { combine, timestamp, label, printf } = _winston.format
+
+const date = new Date().toISOString().slice(0, 10);
+
+
+const myFormat = printf(({ level, message, label, timestamp }) => {
+    return `${timestamp} [${label}] ${level}: ${message}`;
+  });
+  
  
 const logger = _winston.createLogger.call(void 0, {
-    format: _winston.format.combine(
-        _winston.format.errors({ stack: true }),
-        _winston.format.json()
-    ),
+    format: combine(
+        timestamp(),
+        myFormat
+      ),
     transports: [
-        new _winston.transports.File({ filename: 'error.log', level: 'error' }),
-        new _winston.transports.File({ filename: 'info.log', level: 'info' }),
+        new _winston.transports.File({ filename: `../error/${date}.log`, level: 'error' }),
+        new _winston.transports.File({ filename: `../info/${date}.log`, level: 'info' }),
     ],
 });
  

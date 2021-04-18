@@ -8,14 +8,26 @@ var _phone = require('../models/phone'); var _phone2 = _interopRequireDefault(_p
 
 class PhoneController {
   async store(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { person_id, number, is_whatsapp } = req.body;
       await _phone2.default.create({ person_id, number, is_whatsapp });
 
-      _logger2.default.info({ success: "Telefone registrado com sucesso" });
+      _logger2.default.info({
+        level: "info",
+        message: `Telefone id_pessoa: ${person_id} número: ${number} registrado com sucesso`,
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({ success: "Registrado com sucesso" });
     } catch (e) {
-      _logger2.default.error(e.errors.map((err) => err.message));
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+      
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -27,11 +39,12 @@ class PhoneController {
       const phones = await _phone2.default.findAll();
       res.json(phones);
     } catch (e) {
-      _logger2.default.error(e.errors.map((err) => err.message));
     }
   }
 
   async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
       if (!id) {
@@ -48,7 +61,12 @@ class PhoneController {
       }
       return res.json(phone);
     } catch (e) {
-      _logger2.default.error(e.errors.map((err) => err.message));
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `${iduserlogged}, ${userlogged}`,
+      });
+      
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -56,6 +74,8 @@ class PhoneController {
   }
 
   async update(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
 
@@ -73,11 +93,22 @@ class PhoneController {
       }
 
       const { number, is_whatsapp } = req.body;
-      await phone.update({ number, is_whatsapp });
+      const newData = await phone.update({ number, is_whatsapp });
+
+      _logger2.default.info({
+        level: "info",
+        message: `Número id_pessoa: ${id}, número: ${phone.number}, whatsapp ${phone.is_whatsapp}, (número: ${newData.number}, whatsapp ${newData.is_whatsapp}})`,
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
 
       return res.json({ success: "Editado com sucesso" });
     } catch (e) {
-      console.log(e);
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+      
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -85,6 +116,8 @@ class PhoneController {
   }
 
   async delete(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
 
@@ -101,8 +134,21 @@ class PhoneController {
         });
       }
       await phone.destroy();
+
+      _logger2.default.info({
+        level: "info",
+        message: `Telefone excluído com sucesso id_pessoa: ${id}, número: ${phone.number},`,
+        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json("Phone deleted");
     } catch (e) {
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+      });
+      
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

@@ -1,53 +1,78 @@
 import User from "../models/user";
-import Logger from "../logger";
+import logger from "../logger";
 
 class UserController {
   async store(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const { name, login, password } = req.body;
 
       const status_id = 1;
-      await User.create({
+      const newUser = await User.create({
         name,
         login,
         password,
         status_id,
       });
 
-      Logger.info({ success: "Usuário registrado com sucesso" });
+      logger.info({
+        level: "info",
+        message: `Usuário id: ${newUser.id} login: ${newUsers.login} registrado com sucesso`,
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
 
       return res.json({ success: "Usuário registrado com sucesso" });
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
     }
   }
+
   async index(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const users = await User.findAll({
         order: ["status_id"],
       });
-      Logger.info({ success: "Usuário registrado com sucesso" });
+
       return res.json(users);
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Listar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json(null);
     }
   }
 
   async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const user = await User.findByPk(req.params.id);
+
       return res.json(user);
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json(null);
     }
   }
 
   async update(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
 
@@ -66,24 +91,39 @@ class UserController {
 
       const { name, login, password, status_id } = req.body;
 
-      if (password) await user.update(req.body);
+      let newData;
+
+      if (password) newData = await user.update(req.body);
       else {
-        await user.update({
+        newData = await user.update({
           status_id,
           name,
           login,
         });
       }
-      Logger.info({ success: "Usuário registrado com sucesso" });
+
+      logger.info({
+        level: "info",
+        message: `Usuário id: ${user.id}, login: ${user.login} editado com sucesso - (name: ${newData.name} - login: ${newData.login})`,
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({ success: "Usuário registrado com sucesso" });
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message))
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
     }
   }
+
   async delete(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
 
@@ -100,10 +140,21 @@ class UserController {
         });
       }
       await user.update({ status_id: 2 });
-      Logger.info({ success: "Usuário inativo" });
-      return res.json({success: "Usuário inativo"});
+
+      logger.info({
+        level: "info",
+        message: `Usuário inativado com sucesso id: ${user.id}, login ${user.login}`,
+        label: `${iduserlogged}, ${userlogged}`,
+      });
+
+      return res.json({ success: "Usuário inativo" });
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message))
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

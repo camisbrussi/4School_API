@@ -1,21 +1,34 @@
 import Team from "../models/team";
 import Teacher from "../models/teacher";
 import Person from "../models/person";
-import Logger from "../logger";
+import logger from "../logger";
 
 class TeamController {
   async store(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const {teacher_id, name, year} = req.body;
       const status_id = process.env.TEAM_STATUS_ACTIVE;
 
       
-      await Team.create({teacher_id, status_id, name, year});
+      const newTeam = await Team.create({teacher_id, status_id, name, year});
 
-      Logger.info({ success: "Turma registrada com sucesso" });
+      logger.info({
+        level: "info",
+        message: `Turma id: ${newTeam.id} nome: ${newTeam.name} registrada com sucesso`,
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({success:'Registrado com sucesso'});
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -23,6 +36,8 @@ class TeamController {
   }
 
   async index(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     const teams = await Team.findAll({
       attributes: ["id", "name", "year", "status_id"],
       include: [
@@ -46,6 +61,8 @@ class TeamController {
   }
 
   async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
       if (!id) {
@@ -77,7 +94,12 @@ class TeamController {
       }
       return res.json(team);
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -85,6 +107,8 @@ class TeamController {
   }
 
   async update(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
 
@@ -101,12 +125,23 @@ class TeamController {
         });
       }
 
-      await team.update(req.body);
-      Logger.info({ success: "Turma editada com sucesso" });
+      const newData = await team.update(req.body);
+
+      logger.info({
+        level: "info",
+        message: `Turma id: ${team.id}, nome: ${team.name} ano: ${team.year} editado com sucesso - (nome: ${newData.name} ano: ${newData.year})`,
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.json({success:'Editado com sucesso'});
 
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
@@ -114,6 +149,8 @@ class TeamController {
   }
 
   async delete(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
         const { id } = req.params;
   
@@ -130,9 +167,22 @@ class TeamController {
           });
         }
         await team.update({status_id: 2});
+        
+        logger.info({
+          level: "info",
+          message: `Turma inativada com sucesso id: ${team.id}, nome: ${team.name}`,
+          label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        });
+
         return res.json('Team inactive');
     } catch (e) {
-      Logger.error(e.errors.map((err) => err.message));
+
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

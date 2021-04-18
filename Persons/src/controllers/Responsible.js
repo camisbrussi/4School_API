@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-import Logger from "../logger";
+import logger from "../logger";
 
-require('dotenv').config();
+require("dotenv").config();
 dotenv.config();
 
 import Responsible from "../models/responsible";
@@ -11,163 +11,211 @@ import Phone from "../models/phone";
 import Student from "./Student";
 
 class ResponsibleController {
-    async store(req, res) {
-        try {
-            const {name, cpf, email, birth_date, phones, password} = req.body;
-            const type_id = process.env.RESPONSIBLE_PERSON_TYPE;
+  async store(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
 
-            const person = await Person.create({type_id, name, cpf, email, birth_date});
-            const person_id = person.id;
-            const responsible = await Responsible.create({person_id, password},{logging: console.log});
+    try {
+      const { name, cpf, email, birth_date, phones, password } = req.body;
+      const type_id = process.env.RESPONSIBLE_PERSON_TYPE;
 
-            if (phones) {
-                phones.map((v, k) => {
-                    let {number, is_whatsapp} = v;
-                    Phone.create({person_id, number, is_whatsapp});
-                });
-            }
-            Logger.info({ success: "Responsável registrado com sucesso" });
-            return res.json({success: 'Registrado com sucesso', responsible_id: responsible.id});
-        } catch (e) {
-            Logger.error(e.errors.map((err) => err.message));
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
-        }
+      const person = await Person.create({
+        type_id,
+        name,
+        cpf,
+        email,
+        birth_date,
+      });
+      const person_id = person.id;
+      const responsible = await Responsible.create(
+        { person_id, password },
+        { logging: console.log }
+      );
+
+      if (phones) {
+        phones.map((v, k) => {
+          let { number, is_whatsapp } = v;
+          Phone.create({ person_id, number, is_whatsapp });
+        });
+      }
+
+      logger.info({
+        level: "info",
+        message: `Responsável id: ${person_id} nome: ${name} registrado com sucesso`,
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
+      return res.json({
+        success: "Registrado com sucesso",
+        responsible_id: responsible.id,
+      });
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+      });
+
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
     }
+  }
 
-    async index(req, res) {
-        try {
-            const responsibles = await Responsible.findAll({
-                attributes: ["id"],
-                include: [
-                    {
-                        model: Person,
-                        as: "person",
-                        attributes: ["id", "name", "cpf", "email", "birth_date"],
-                        include: [
-                            {
-                                model: PersonType,
-                                as: "type",
-                                attributes: ["id", "description"]
-                            }, {
-                                model: Phone,
-                                as: "phones",
-                                attributes: ["id", "number", "is_whatsapp"]
-                            }
-                        ]
-                    }
-                ],
-                order: [
-                    [Person, "name", "asc"]
-                ]
-            });
+  async index(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
 
-            res.json(responsibles);
-        } catch (e) {
-            Logger.error(e.errors.map((err) => err.message));
-        }
+    try {
+      const responsibles = await Responsible.findAll({
+        attributes: ["id"],
+        include: [
+          {
+            model: Person,
+            as: "person",
+            attributes: ["id", "name", "cpf", "email", "birth_date"],
+            include: [
+              {
+                model: PersonType,
+                as: "type",
+                attributes: ["id", "description"],
+              },
+              {
+                model: Phone,
+                as: "phones",
+                attributes: ["id", "number", "is_whatsapp"],
+              },
+            ],
+          },
+        ],
+        order: [[Person, "name", "asc"]],
+      });
+
+      res.json(responsibles);
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Listar, ${iduserlogged}, ${userlogged}`,
+      });
     }
+  }
 
-    async show(req, res) {
-        try {
-            const {id} = req.params;
-            if (!id) {
-                return res.status(400).json({
-                    errors: ["Missing ID"],
-                });
-            }
+  async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
 
-            const responsible = await Responsible.findByPk(id, {
-                attributes: ["id"],
-                include: [
-                    {
-                        model: Person,
-                        as: "person",
-                        attributes: ["id", "name", "cpf", "email", "birth_date"],
-                        include: [
-                            {
-                                model: PersonType,
-                                as: "type",
-                                attributes: ["id", "description"]
-                            },{
-                                model: Phone,
-                                as: "phones",
-                                attributes: ["id", "number", "is_whatsapp"]
-                            }
-                        ]
-                    }
-                ]
-            });
-            if (!responsible) {
-                return res.status(400).json({
-                    errors: ["Responsible does not exist"],
-                });
-            }
-            return res.json(responsible);
-        } catch (e) {
-            Logger.error(e.errors.map((err) => err.message));
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
-        }
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({
+          errors: ["Missing ID"],
+        });
+      }
+
+      const responsible = await Responsible.findByPk(id, {
+        attributes: ["id"],
+        include: [
+          {
+            model: Person,
+            as: "person",
+            attributes: ["id", "name", "cpf", "email", "birth_date"],
+            include: [
+              {
+                model: PersonType,
+                as: "type",
+                attributes: ["id", "description"],
+              },
+              {
+                model: Phone,
+                as: "phones",
+                attributes: ["id", "number", "is_whatsapp"],
+              },
+            ],
+          },
+        ],
+      });
+      if (!responsible) {
+        return res.status(400).json({
+          errors: ["Responsible does not exist"],
+        });
+      }
+      return res.json(responsible);
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+      });
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
     }
+  }
 
-    async update(req, res) {
-        try {
-            const {id} = req.params;
+  async update(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+    try {
+      const { id } = req.params;
 
-            if (!id) {
-                return res.status(400).json({
-                    errors: ["Missing ID"],
-                });
-            }
+      if (!id) {
+        return res.status(400).json({
+          errors: ["Missing ID"],
+        });
+      }
 
-            const responsible = await Responsible.findByPk(id);
-            if (!responsible) {
-                return res.status(400).json({
-                    errors: ["Responsible does not exist"]
-                });
-            }
+      const responsible = await Responsible.findByPk(id);
+      if (!responsible) {
+        return res.status(400).json({
+          errors: ["Responsible does not exist"],
+        });
+      }
 
-            const person = await Person.findByPk(responsible.person_id);
-            if (!person) {
-                return res.status(400).json({
-                    errors: ["Person does not exist"]
-                });
-            }
+      const person = await Person.findByPk(responsible.person_id);
+      if (!person) {
+        return res.status(400).json({
+          errors: ["Person does not exist"],
+        });
+      }
 
-            const {name, cpf, email, birth_date, phones, password} = req.body;
-            await person.update({name, cpf, email, birth_date});
+      const { name, cpf, email, birth_date, phones, password } = req.body;
+      const newData = await person.update({ name, cpf, email, birth_date });
 
-            if (password) {
-                await responsible.update({password});
-            }
+      if (password) {
+        await responsible.update({ password });
+      }
 
-            await Phone.destroy({
-                where: { "person_id":person.id }
-            });
+      await Phone.destroy({
+        where: { person_id: person.id },
+      });
 
-            if (phones) {
-                await phones.map((v,k) => {
-                    let {number, is_whatsapp} = v;
-                    Phone.create({"person_id":person.id, number, is_whatsapp});
-                });
-            }
-            Logger.info({ success: "Responsável editado com sucesso" });
-            return res.json({success: 'Editado com sucesso'});
-        } catch (e) {
-            Logger.error(e.errors.map((err) => err.message));
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
-        }
+      if (phones) {
+        await phones.map((v, k) => {
+          let { number, is_whatsapp } = v;
+          Phone.create({ person_id: person.id, number, is_whatsapp });
+        });
+      }
+
+      logger.info({
+        level: "info",
+        message: `Responsável id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+
+      return res.json({ success: "Editado com sucesso" });
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Editar, ${iduserlogged}, ${userlogged}`,
+      });
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
     }
+  }
 
-    async delete(req, res) {
-        return res.json('Não é possível remover responsáveis');
+  async delete(req, res) {
+    return res.json("Não é possível remover responsáveis");
 
-        /*
+    /*
         try {
             const {id} = req.params;
 
@@ -190,7 +238,7 @@ class ResponsibleController {
                 errors: e.errors.map((err) => err.message),
             });
         }*/
-    }
+  }
 }
 
 export default new ResponsibleController();

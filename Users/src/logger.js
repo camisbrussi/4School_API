@@ -1,13 +1,22 @@
 import { createLogger, format as _format, transports as _transports } from 'winston';
+const { combine, timestamp, label, printf } = _format
+
+const date = new Date().toISOString().slice(0, 10);
+
+
+const myFormat = printf(({ level, message, label, timestamp }) => {
+    return `${timestamp} [${label}] ${level}: ${message}`;
+  });
+  
  
 const logger = createLogger({
-    format: _format.combine(
-        _format.errors({ stack: true }),
-        _format.json()
-    ),
+    format: combine(
+        timestamp(),
+        myFormat
+      ),
     transports: [
-        new _transports.File({ filename: 'error.log', level: 'error' }),
-        new _transports.File({ filename: 'info.log', level: 'info' }),
+        new _transports.File({ filename: `../error/${date}.log`, level: 'error' }),
+        new _transports.File({ filename: `../info/${date}.log`, level: 'info' }),
     ],
 });
  
