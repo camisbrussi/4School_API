@@ -10,6 +10,7 @@ var _responsible = require('../models/responsible'); var _responsible2 = _intero
 var _person = require('../models/person'); var _person2 = _interopRequireDefault(_person);
 var _person_type = require('../models/person_type'); var _person_type2 = _interopRequireDefault(_person_type);
 var _phone = require('../models/phone'); var _phone2 = _interopRequireDefault(_phone);
+var _sequelize = require('sequelize');
 
 class StudentController {
   async store(req, res) {
@@ -143,6 +144,90 @@ class StudentController {
             model: _person2.default,
             as: "person",
             attributes: ["id", "name", "cpf", "email", "birth_date"],
+            include: [
+              {
+                model: _person_type2.default,
+                as: "type",
+                attributes: ["id", "description"],
+              },
+              {
+                model: _phone2.default,
+                as: "phones",
+                attributes: ["id", "number", "is_whatsapp"],
+              },
+            ],
+          },
+          {
+            model: _responsible2.default,
+            as: "responsible",
+            attributes: ["id"],
+            include: [
+              {
+                model: _person2.default,
+                as: "person",
+                attributes: ["id", "name", "cpf", "email", "birth_date"],
+                include: [
+                  {
+                    model: _person_type2.default,
+                    as: "type",
+                    attributes: ["id", "description"],
+                  },
+                  {
+                    model: _phone2.default,
+                    as: "phones",
+                    attributes: ["id", "number", "is_whatsapp"],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: _student_status2.default,
+            as: "status",
+            attributes: ["id", "description"],
+          },
+        ],
+        order: ["status_id", [_person2.default, "name", "asc"]],
+      });
+
+      res.json(students);
+    } catch (e) {
+      _logger2.default.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+      });
+    }
+  }
+
+  async indexFilter(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
+    try {
+      let {status_id, name, cpf, yearBirth} = req.query;
+
+      let whereStudent = {};
+      let whereStudentPerson = {};
+
+      if (status_id)
+        whereStudent.status_id = status_id;
+
+      if (name)
+        whereStudentPerson.name = {[_sequelize.Op.substring] : name};
+      if (cpf)
+        whereStudentPerson.cpf = cpf;
+      if (yearBirth)
+        whereStudentPerson.birth_date = {[_sequelize.Op.between] : [yearBirth+"-01-01", yearBirth+"-12-31"]}
+
+      const students = await _student2.default.findAll({
+        attributes: ["id"],
+        where: whereStudent,
+        include: [
+          {
+            model: _person2.default,
+            as: "person",
+            attributes: ["id", "name", "cpf", "email", "birth_date"],
+            where: whereStudentPerson,
             include: [
               {
                 model: _person_type2.default,

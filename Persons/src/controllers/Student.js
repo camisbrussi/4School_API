@@ -10,6 +10,7 @@ import Responsible from "../models/responsible";
 import Person from "../models/person";
 import PersonType from "../models/person_type";
 import Phone from "../models/phone";
+import {Op} from "sequelize";
 
 class StudentController {
   async store(req, res) {
@@ -143,6 +144,90 @@ class StudentController {
             model: Person,
             as: "person",
             attributes: ["id", "name", "cpf", "email", "birth_date"],
+            include: [
+              {
+                model: PersonType,
+                as: "type",
+                attributes: ["id", "description"],
+              },
+              {
+                model: Phone,
+                as: "phones",
+                attributes: ["id", "number", "is_whatsapp"],
+              },
+            ],
+          },
+          {
+            model: Responsible,
+            as: "responsible",
+            attributes: ["id"],
+            include: [
+              {
+                model: Person,
+                as: "person",
+                attributes: ["id", "name", "cpf", "email", "birth_date"],
+                include: [
+                  {
+                    model: PersonType,
+                    as: "type",
+                    attributes: ["id", "description"],
+                  },
+                  {
+                    model: Phone,
+                    as: "phones",
+                    attributes: ["id", "number", "is_whatsapp"],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: StudentStatus,
+            as: "status",
+            attributes: ["id", "description"],
+          },
+        ],
+        order: ["status_id", [Person, "name", "asc"]],
+      });
+
+      res.json(students);
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+      });
+    }
+  }
+
+  async indexFilter(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
+    try {
+      let {status_id, name, cpf, yearBirth} = req.query;
+
+      let whereStudent = {};
+      let whereStudentPerson = {};
+
+      if (status_id)
+        whereStudent.status_id = status_id;
+
+      if (name)
+        whereStudentPerson.name = {[Op.substring] : name};
+      if (cpf)
+        whereStudentPerson.cpf = cpf;
+      if (yearBirth)
+        whereStudentPerson.birth_date = {[Op.between] : [yearBirth+"-01-01", yearBirth+"-12-31"]}
+
+      const students = await Student.findAll({
+        attributes: ["id"],
+        where: whereStudent,
+        include: [
+          {
+            model: Person,
+            as: "person",
+            attributes: ["id", "name", "cpf", "email", "birth_date"],
+            where: whereStudentPerson,
             include: [
               {
                 model: PersonType,

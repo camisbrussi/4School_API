@@ -8,10 +8,7 @@ import express from "express";
 import cors from 'cors';
 import helmet from 'helmet'
 
-
 import teamRoutes from "./routes/team";
-
-
 
 const whiteList = [
   'http://localhost:3000',

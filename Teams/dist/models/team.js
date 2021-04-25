@@ -37,7 +37,9 @@
   } 
   static associate(models){ 
     this.belongsTo(models.teacher, {foreignKey:"teacher_id", as:"teacher"});
-    this.hasOne(models.team_status, { foreignKey: 'status_id'}) 
-   
+    this.belongsTo(models.team_status, {foreignKey:"status_id", as:"status"});
+    // this.hasOne(models.team_status, { foreignKey: 'status_id'})
+
+      this.hasMany(models.team_has_student, {foreignKey: "team_id"});
   } 
 } exports.default = team; 

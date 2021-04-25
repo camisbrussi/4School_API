@@ -1,3 +1,4 @@
+import logger from "../logger";
 import Sequelize from 'sequelize';
 import databaseConfig from '../config/database';
 import Activity from '../models/activity'

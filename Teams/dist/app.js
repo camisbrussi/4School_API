@@ -8,10 +8,7 @@ var _express = require('express'); var _express2 = _interopRequireDefault(_expre
 var _cors = require('cors'); var _cors2 = _interopRequireDefault(_cors);
 var _helmet = require('helmet'); var _helmet2 = _interopRequireDefault(_helmet);
 
-
 var _team = require('./routes/team'); var _team2 = _interopRequireDefault(_team);
-
-
 
 const whiteList = [
   'http://localhost:3000',
