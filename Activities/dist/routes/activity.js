@@ -10,5 +10,8 @@ router.get("/", _loginRequired2.default, _Activity2.default.index);
 router.post("/", _loginRequired2.default, _Activity2.default.store);
 router.put("/:id", _loginRequired2.default, _Activity2.default.update);
 router.delete("/:id", _loginRequired2.default, _Activity2.default.delete);
+router.get("/participants/:id", _loginRequired2.default, _Activity2.default.showParticipants);
+router.get("/participants/teachers/:id", _loginRequired2.default, _Activity2.default.showParticipantsTeachers);
+router.post("/addparticipants/:id", _loginRequired2.default, _Activity2.default.storeParticipants);
 
 exports. default = router;

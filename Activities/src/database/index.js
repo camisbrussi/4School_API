@@ -3,8 +3,12 @@ import Sequelize from 'sequelize';
 import databaseConfig from '../config/database';
 import Activity from '../models/activity'
 import Activity_status from '../models/activity_status'
+import ActivityHasParticipant from '../models/activity_has_participant'
+import Person from '../models/person'
+import PersonType from '../models/person_type'
+import Phone from '../models/phone'
 
-const models = [Activity, Activity_status];
+const models = [Activity, Activity_status, ActivityHasParticipant, Person, PersonType, Phone];
 const connection = new Sequelize(databaseConfig);
 connectionDb();
 

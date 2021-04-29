@@ -1,169 +1,395 @@
+import dotenv from "dotenv";
+require("dotenv").config();
+dotenv.config();
+
 import Activity from "../models/activity";
+import ActivityHasParticipant from "../models/activity_has_participant";
 import logger from "../logger";
+import Person from "../models/person";
+import PersonType from "../models/person_type";
+import Phone from "../models/phone";
 
 class ActivityController {
-  async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-    try {
-      const {
-        name,
-        description,
-        start,
-        end,
-        generate_certificate,
-        vacancies,
-      } = req.body;
-      
-      const status_id = 1;
+    async store(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        try {
+            const {
+                name,
+                description,
+                start,
+                end,
+                generate_certificate,
+                vacancies,
+            } = req.body;
 
-      const newActivity = await Activity.create({
-        name,
-        description,
-        start,
-        end,
-        generate_certificate,
-        vacancies,
-        status_id,
-      });
-      
-      logger.info({
-        level: "info",
-        message: `Atividade id: ${newActivity.id} login: ${newActivity.name} registrada com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
-      });
+            const status_id = 1;
 
-      return res.json({ success: "Atividade Registrada com sucesso" });
-    } catch (e) {
+            const newActivity = await Activity.create({
+                name,
+                description,
+                start,
+                end,
+                generate_certificate,
+                vacancies,
+                status_id,
+            });
 
-      logger.error({
-        level: "error",
-        message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
-      });
+            logger.info({
+                level: "info",
+                message: `Atividade id: ${newActivity.id} login: ${newActivity.name} registrada com sucesso`,
+                label: `Registrar, ${iduserlogged}, ${userlogged}`,
+            });
 
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+            return res.json({success: "Atividade Registrada com sucesso"});
+        } catch (e) {
+
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `Registrar, ${iduserlogged}, ${userlogged}`,
+            });
+
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
     }
-  }
 
-  async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-    const activities = await Activity.findAll({
-      attributes: ["id", "name", "start", "end", "status_id"],
-      order: ["status_id", ["start", "desc"], ["name", "asc"]],
-    });
-    res.json(activities);
-  }
-
-  async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-    try {
-      const { id } = req.params;
-      if (!id) {
-        return res.status(400).json({
-          errors: ["Missing ID"],
+    async index(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        const activities = await Activity.findAll({
+            attributes: ["id", "name", "start", "end", "status_id"],
+            order: ["status_id", ["start", "desc"], ["name", "asc"]],
         });
-      }
-
-      const activity = await Activity.findByPk(id);
-      if (!activity) {
-        return res.status(400).json({
-          errors: ["Activity does not exist"],
-        });
-      }
-
-      return res.json(activity);
-    } catch (e) {
-      logger.error({
-        level: "error",
-        message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
-      });
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+        res.json(activities);
     }
-  }
-  async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-    try {
-      const { id } = req.params;
 
-      if (!id) {
-        return res.status(400).json({
-          errors: ["Missing ID"],
-        });
-      }
+    async show(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        try {
+            const {id} = req.params;
+            if (!id) {
+                return res.status(400).json({
+                    errors: ["Missing ID"],
+                });
+            }
 
-      const activity = await Activity.findByPk(id);
-      if (!activity) {
-        return res.status(400).json({
-          errors: ["Activity does not exist"],
-        });
-      }
+            const activity = await Activity.findByPk(id);
+            if (!activity) {
+                return res.status(400).json({
+                    errors: ["Activity does not exist"],
+                });
+            }
 
-      const newActivity = await activity.update(req.body);
-
-      logger.info({
-        level: "info",
-        message: `Atividade id: ${activity.id}, nome: ${activity.name}, inicio ${activity.start}, fim ${activity.end}, vagas ${activity.vacancies}, certificado ${activity.generate_certificate} - (nome: ${newActivity.name}, inicio ${newActivity.start}, fim ${newActivity.end}, vagas ${newActivity.vacancies}, certificado ${newActivity.generate_certificate})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
-      });
-
-
-      return res.json({ success: "Editado com sucesso" });
-    } catch (e) {
-      logger.error({
-        level: "error",
-        message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
-      });
-
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+            return res.json(activity);
+        } catch (e) {
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `${iduserlogged}, ${userlogged}`,
+            });
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
     }
-  }
 
-  async delete(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-    try {
-      const { id } = req.params;
+    async update(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        try {
+            const {id} = req.params;
 
-      if (!id) {
-        return res.status(400).json({
-          errors: ["Missing ID"],
-        });
-      }
+            if (!id) {
+                return res.status(400).json({
+                    errors: ["Missing ID"],
+                });
+            }
 
-      const activity = await Activity.findByPk(id);
-      if (!activity) {
-        return res.status(400).json({
-          errors: ["Atividade não existe"],
-        });
-      }
-      await activity.update({ status_id: 2 });
-      
-      logger.info({
-        level: "info",
-        message: `Atividade inativada com sucesso ${activity.name}`,
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
-      });
+            const activity = await Activity.findByPk(id);
+            if (!activity) {
+                return res.status(400).json({
+                    errors: ["Activity does not exist"],
+                });
+            }
 
-      return res.json({ success: "Atividade inativa" });
-    } catch (e) {
-      logger.error({
-        level: "error",
-        message: e.errors.map((err) => err.message),
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
-      });
+            const newActivity = await activity.update(req.body);
 
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+            logger.info({
+                level: "info",
+                message: `Atividade id: ${activity.id}, nome: ${activity.name}, inicio ${activity.start}, fim ${activity.end}, vagas ${activity.vacancies}, certificado ${activity.generate_certificate} - (nome: ${newActivity.name}, inicio ${newActivity.start}, fim ${newActivity.end}, vagas ${newActivity.vacancies}, certificado ${newActivity.generate_certificate})`,
+                label: `Editar, ${iduserlogged}, ${userlogged}`,
+            });
+
+
+            return res.json({success: "Editado com sucesso"});
+        } catch (e) {
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `Editar, ${iduserlogged}, ${userlogged}`,
+            });
+
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
     }
-  }
+
+    async delete(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        try {
+            const {id} = req.params;
+
+            if (!id) {
+                return res.status(400).json({
+                    errors: ["Missing ID"],
+                });
+            }
+
+            const activity = await Activity.findByPk(id);
+            if (!activity) {
+                return res.status(400).json({
+                    errors: ["Atividade não existe"],
+                });
+            }
+            await activity.update({status_id: 2});
+
+            logger.info({
+                level: "info",
+                message: `Atividade inativada com sucesso ${activity.name}`,
+                label: `Deletar, ${iduserlogged}, ${userlogged}`,
+            });
+
+            return res.json({success: "Atividade inativa"});
+        } catch (e) {
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `Deletar, ${iduserlogged}, ${userlogged}`,
+            });
+
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
+    }
+
+    async showParticipants(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        try {
+            const {id} = req.params;
+            if (!id) {
+                return res.status(400).json({
+                    errors: ["Missing ID"],
+                });
+            }
+
+            const activity = await Activity.findByPk(id);
+            if (!activity) {
+                return res.status(400).json({
+                    errors: ["Activity does not exist"],
+                });
+            }
+
+            const participants = await ActivityHasParticipant.findAll({
+                attributes: ["id","registration_date","number_tickets","participation_date","number_participation"],
+                include: [{
+                    model: Person,
+                    as:"person",
+                    attributes: ['id','name','cpf','email','birth_date'],
+                    include: [{
+                        model: PersonType,
+                        as:"type",
+                        attributes: ['id','description']
+                    },{
+                        model: Phone,
+                        as:"phones",
+                        attributes: ['id','number','is_whatsapp']
+                    }]
+                }],
+                where: {
+                    activity_id: activity.id
+                },
+                order: [[Person,'name','asc']]
+            })
+
+            return res.json(participants);
+        } catch (e) {
+            console.log(e);
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `${iduserlogged}, ${userlogged}`,
+            });
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
+    }
+
+    async showParticipantsTeachers(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        try {
+            const {id} = req.params;
+            if (!id) {
+                return res.status(400).json({
+                    errors: ["Missing ID"],
+                });
+            }
+
+            const activity = await Activity.findByPk(id);
+            if (!activity) {
+                return res.status(400).json({
+                    errors: ["Activity does not exist"],
+                });
+            }
+
+            const participants = await ActivityHasParticipant.findAll({
+                attributes: ["id","registration_date","number_tickets","participation_date","number_participation"],
+                include: [{
+                    model: Person,
+                    as:"person",
+                    attributes: ['id','name','cpf','email','birth_date'],
+                    where: {type_id : process.env.TEACHER_PERSON_TYPE},
+                    include: [{
+                        model: PersonType,
+                        as:"type",
+                        attributes: ['id','description']
+                    },{
+                        model: Phone,
+                        as:"phones",
+                        attributes: ['id','number','is_whatsapp']
+                    }]
+                }],
+                where: {
+                    activity_id: activity.id
+                },
+                order: [[Person,'name','asc']]
+            })
+
+            return res.json(participants);
+        } catch (e) {
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `${iduserlogged}, ${userlogged}`,
+            });
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
+    }
+
+    async storeParticipants(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+
+        try {
+            const {id} = req.params;
+            if (!id) {
+                return res.status(400).json({
+                    errors: ["Missing ID"],
+                });
+            }
+
+            const {participants} = req.body;
+            if (!participants.length) {
+                return res.status(400).json({
+                    errors: ["Missing Students"],
+                });
+            }
+
+            const activity = await Activity.findByPk(id);
+            if (!activity) {
+                return res.status(400).json({
+                    errors: ["Activity does not exist"],
+                });
+            }
+
+            let erros = [];
+
+            //- E agora salvamos os participantes da atividade
+            for (let i = 0; i < participants.length; i++) {
+                let person_id = participants[i].person.id;
+                let activity_id = activity.id;
+                let registration_date = new Date().toISOString().slice(0, 19);
+                let number_ticktes = 1;
+
+                //- Verifica se o participante ja esta registrado na atividade
+                let registro = await ActivityHasParticipant.findAll({
+                    where: {
+                        activity_id,
+                        person_id
+                    }
+                });
+
+                if (!registro || registro.length <= 0) { //- Ainda nao possui esse participante nessa atividade, entao registra
+                    await ActivityHasParticipant.create({activity_id, person_id, registration_date, number_ticktes});
+                }
+            }
+
+            //- Acho que nao precisa salvar esse tipo de log
+            /*logger.info({
+                level: "info",
+                message: `Turma id: ${newTeam.id} nome: ${newTeam.name} registrada com sucesso`,
+                label: `Registrar, ${iduserlogged}, ${userlogged}`,
+            });*/
+
+            if (erros.length)
+                return res.json({success: 'Erro ao registrar um ou mais participantes', erros});
+            else
+                return res.json({success: 'Registrado com sucesso'});
+        } catch (e) {
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `Registrar, ${iduserlogged}, ${userlogged}`,
+            });
+
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
+    }
+
+    async deleteSubscription(req, res) {
+        const {userlogged, iduserlogged} = req.headers;
+        try {
+            // const {id} = req.params;
+            const {subscriptionId} = req.params;
+
+            if (!subscriptionId) {
+                return res.status(400).json({
+                    errors: ["Missing ID"],
+                });
+            }
+
+            const subscription = await ActivityHasParticipant.findByPk(subscriptionId);
+            if (!subscription) {
+                return res.status(400).json({
+                    errors: ["Inscrição não existe"],
+                });
+            }
+            await subscription.destroy();
+
+            logger.info({
+                level: "info",
+                message: `Inscrição deletada com sucesso ${subscription.id}`,
+                label: `Deletar, ${iduserlogged}, ${userlogged}`,
+            });
+
+            return res.json({success: "Inscrição removida"});
+        } catch (e) {
+            logger.error({
+                level: "error",
+                message: e.errors.map((err) => err.message),
+                label: `Deletar, ${iduserlogged}, ${userlogged}`,
+            });
+
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
+    }
 }
 
 export default new ActivityController();
