@@ -5,7 +5,7 @@ const date = new Date().toISOString().slice(0, 10);
 
 
 const myFormat = printf(({ level, message, label, timestamp }) => {
-    return `${timestamp} [${label}] ${level}: ${message}`;
+    return `${timestamp} | [${label}] ${level}: ${message}`;
   });
   
  

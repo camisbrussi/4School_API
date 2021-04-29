@@ -38,8 +38,8 @@ class TeacherController {
 
       _logger2.default.info({
         level: "info",
-        message: `Professor id: ${person.id} nome: ${person.name} registrado com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        message: `Professor ${person.name} (id: ${person.id})registrado com sucesso`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Registrado com sucesso" });
@@ -47,7 +47,7 @@ class TeacherController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -56,6 +56,8 @@ class TeacherController {
   }
 
   async index(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const teachers = await _teacher2.default.findAll({
         attributes: ["id"],
@@ -88,15 +90,19 @@ class TeacherController {
 
       res.json(teachers);
     } catch (e) {
+    const { userlogged, iduserlogged } = req.headers;
+
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Listar, ${iduserlogged}, ${userlogged}`,
+        label: `Listar - ${userlogged}@${iduserlogged}`,
       });
     }
   }
 
   async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+
     try {
       const { id } = req.params;
       if (!id) {
@@ -142,7 +148,7 @@ class TeacherController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+        label: `Buscar - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -213,7 +219,7 @@ class TeacherController {
       _logger2.default.info({
         level: "info",
         message: `Professor id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Editado com sucesso" });
@@ -221,7 +227,7 @@ class TeacherController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -253,7 +259,7 @@ class TeacherController {
       _logger2.default.info({
         level: "info",
         message: `Professor inativado com sucesso id: ${id}, nome ${person.name}`,
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Exclusão - ${userlogged}@${iduserlogged}`,
       });
       
       return res.json("Teacher inactive");
@@ -261,7 +267,7 @@ class TeacherController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Exclusão - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),

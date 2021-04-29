@@ -8,8 +8,6 @@ var _express = require('express'); var _express2 = _interopRequireDefault(_expre
 var _cors = require('cors'); var _cors2 = _interopRequireDefault(_cors);
 var _helmet = require('helmet'); var _helmet2 = _interopRequireDefault(_helmet);
 
-
-
 var _user = require('./routes/user'); var _user2 = _interopRequireDefault(_user);
 var _token = require('./routes/token'); var _token2 = _interopRequireDefault(_token);
 

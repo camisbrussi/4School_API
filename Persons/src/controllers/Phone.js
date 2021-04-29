@@ -16,8 +16,8 @@ class PhoneController {
 
       logger.info({
         level: "info",
-        message: `Telefone id_pessoa: ${person_id} número: ${number} registrado com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        message: `Telefone ${number} (id_person: ${person_id} ) registrado com sucesso`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Registrado com sucesso" });
@@ -25,7 +25,7 @@ class PhoneController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
       
       return res.status(400).json({
@@ -64,7 +64,7 @@ class PhoneController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Busca - ${userlogged}@${iduserlogged}`,
       });
       
       return res.status(400).json({
@@ -98,7 +98,7 @@ class PhoneController {
       logger.info({
         level: "info",
         message: `Número id_pessoa: ${id}, número: ${phone.number}, whatsapp ${phone.is_whatsapp}, (número: ${newData.number}, whatsapp ${newData.is_whatsapp}})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Editado com sucesso" });
@@ -106,7 +106,7 @@ class PhoneController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
       
       return res.status(400).json({
@@ -138,7 +138,7 @@ class PhoneController {
       logger.info({
         level: "info",
         message: `Telefone excluído com sucesso id_pessoa: ${id}, número: ${phone.number},`,
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Exclusão - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json("Phone deleted");
@@ -146,7 +146,7 @@ class PhoneController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Exclusão, ${iduserlogged}, ${userlogged}`,
       });
       
       return res.status(400).json({

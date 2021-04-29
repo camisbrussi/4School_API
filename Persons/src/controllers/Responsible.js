@@ -40,8 +40,8 @@ class ResponsibleController {
 
       logger.info({
         level: "info",
-        message: `Responsável id: ${person_id} nome: ${name} registrado com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        message: `Responsável id: ${name} (id: ${person_id}) registrado com sucesso`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({
@@ -52,7 +52,7 @@ class ResponsibleController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -94,7 +94,7 @@ class ResponsibleController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Listar, ${iduserlogged}, ${userlogged}`,
+        label: `Listar - ${userlogged}@${iduserlogged}`,
       });
     }
   }
@@ -142,7 +142,7 @@ class ResponsibleController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+        label: `Busca - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -196,7 +196,7 @@ class ResponsibleController {
       logger.info({
         level: "info",
         message: `Responsável id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Editado com sucesso" });
@@ -204,7 +204,7 @@ class ResponsibleController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),

@@ -5,11 +5,12 @@ const date = new Date().toISOString().slice(0, 10);
 
 
 const myFormat = printf(({ level, message, label, timestamp }) => {
-    return `${timestamp} [${label}] ${level}: ${message}`;
+    return `${timestamp} | [${label}] ${level}: ${message}`;
   });
   
  
 const logger = _winston.createLogger.call(void 0, {
+    level: 'info',
     format: combine(
         timestamp(),
         myFormat

@@ -40,8 +40,8 @@ class StudentController {
       
       logger.info({
         level: "info",
-        message: `Estudante id: ${person_id} nome: ${name} registrado com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        message: `Estudante ${name} (id: ${person_id})registrado com sucesso`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Registrado com sucesso" });
@@ -49,7 +49,7 @@ class StudentController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -120,7 +120,7 @@ class StudentController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Listar, ${iduserlogged}, ${userlogged}`,
+        label: `Listar - ${userlogged}@${iduserlogged}`,
       });
     }
   }
@@ -195,7 +195,7 @@ class StudentController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+        label: `Buscar - ${userlogged}@${iduserlogged}`,
       });
     }
   }
@@ -279,7 +279,7 @@ class StudentController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+        label: `Buscar - ${userlogged}@${iduserlogged}`,
       });
     }
   }
@@ -356,7 +356,7 @@ class StudentController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+        label: `Buscar - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -423,7 +423,7 @@ class StudentController {
     logger.info({
         level: "info",
         message: `Estudante id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Editado com sucesso" });
@@ -431,7 +431,7 @@ class StudentController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -463,7 +463,7 @@ class StudentController {
       logger.info({
         level: "info",
         message: `Estudante inativado com sucesso id: ${id}, nome: ${person.name}`,
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Inativação - ${userlogged}@${iduserlogged}`,
       });
       
       return res.json("Student inactive");
@@ -471,7 +471,7 @@ class StudentController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Inativação - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),

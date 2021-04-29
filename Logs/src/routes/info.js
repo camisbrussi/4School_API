@@ -5,8 +5,9 @@ import loginRequired from "../middlewares/loginRequired";
 
 const router = new Router();
 
-router.get('/', loginRequired, infoController.index);
-router.get('/:data', loginRequired, infoController.show);
+router.get('/', infoController.index);
+router.get('/show/:arquive', infoController.show);
+router.post('/filter', infoController.filterIndex);
 
 
 export default router;

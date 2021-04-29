@@ -28,8 +28,8 @@ class ActivityController {
       
       logger.info({
         level: "info",
-        message: `Atividade id: ${newActivity.id} login: ${newActivity.name} registrada com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        message: `Atividade ${newActivity.name} (id: ${newActivity.id} registrada com sucesso)`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Atividade Registrada com sucesso" });
@@ -38,7 +38,7 @@ class ActivityController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -78,7 +78,7 @@ class ActivityController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Busca - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -108,7 +108,7 @@ class ActivityController {
       logger.info({
         level: "info",
         message: `Atividade id: ${activity.id}, nome: ${activity.name}, inicio ${activity.start}, fim ${activity.end}, vagas ${activity.vacancies}, certificado ${activity.generate_certificate} - (nome: ${newActivity.name}, inicio ${newActivity.start}, fim ${newActivity.end}, vagas ${newActivity.vacancies}, certificado ${newActivity.generate_certificate})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
 
@@ -117,7 +117,7 @@ class ActivityController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -148,7 +148,7 @@ class ActivityController {
       logger.info({
         level: "info",
         message: `Atividade inativada com sucesso ${activity.name}`,
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Inativação - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Atividade inativa" });
@@ -156,7 +156,7 @@ class ActivityController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Inativação - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
