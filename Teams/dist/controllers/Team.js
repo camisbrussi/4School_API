@@ -18,8 +18,8 @@ class TeamController {
 
             _logger2.default.info({
                 level: "info",
-                message: `Turma id: ${newTeam.id} nome: ${newTeam.name} registrada com sucesso`,
-                label: `Registrar, ${iduserlogged}, ${userlogged}`,
+                message: `Turma ${newTeam.name} (id: ${newTeam.id} registrada com sucesso`,
+               label: `Registro - ${userlogged}@${iduserlogged}`,
             });
 
             return res.json({success: 'Registrado com sucesso', id: newTeam.id});
@@ -27,7 +27,7 @@ class TeamController {
             _logger2.default.error({
                 level: "error",
                 message: e.errors.map((err) => err.message),
-                label: `Registrar, ${iduserlogged}, ${userlogged}`,
+               label: `Registro - ${userlogged}@${iduserlogged}`,
             });
 
             return res.status(400).json({
@@ -140,7 +140,7 @@ class TeamController {
             _logger2.default.error({
                 level: "error",
                 message: e.errors.map((err) => err.message),
-                label: `Registrar, ${iduserlogged}, ${userlogged}`,
+                label: `Registro - ${userlogged}@${iduserlogged}`,
             });
 
             return res.status(400).json({
@@ -211,7 +211,7 @@ class TeamController {
             _logger2.default.error({
                 level: "error",
                 message: e.errors.map((err) => err.message),
-                label: `Buscar, ${iduserlogged}, ${userlogged}`,
+                label: `Busca - ${userlogged}@${iduserlogged}`,
             });
 
             return res.status(400).json({
@@ -244,7 +244,7 @@ class TeamController {
             _logger2.default.info({
                 level: "info",
                 message: `Turma id: ${team.id}, nome: ${team.name} ano: ${team.year} editado com sucesso - (nome: ${newData.name} ano: ${newData.year})`,
-                label: `Editar, ${iduserlogged}, ${userlogged}`,
+                label: `Edição - ${userlogged}@${iduserlogged}`,
             });
 
             return res.json({success: 'Editado com sucesso'});
@@ -253,7 +253,7 @@ class TeamController {
             _logger2.default.error({
                 level: "error",
                 message: e.errors.map((err) => err.message),
-                label: `Editar, ${iduserlogged}, ${userlogged}`,
+                label: `Edição - ${userlogged}@${iduserlogged}`,
             });
 
             return res.status(400).json({
@@ -285,7 +285,7 @@ class TeamController {
             _logger2.default.info({
                 level: "info",
                 message: `Turma inativada com sucesso id: ${team.id}, nome: ${team.name}`,
-                label: `Deletar, ${iduserlogged}, ${userlogged}`,
+                label: `Exclusão - ${userlogged}@${iduserlogged}`,
             });
 
             return res.json('Team inactive');
@@ -293,7 +293,7 @@ class TeamController {
             _logger2.default.error({
                 level: "error",
                 message: e.errors.map((err) => err.message),
-                label: `Deletar, ${iduserlogged}, ${userlogged}`,
+                label: `Exclusão - ${userlogged}@${iduserlogged}`,
             });
 
             return res.status(400).json({

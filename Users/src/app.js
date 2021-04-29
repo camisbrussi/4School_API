@@ -8,8 +8,6 @@ import express from "express";
 import cors from 'cors';
 import helmet from 'helmet'
 
-
-
 import userRoutes from "./routes/user";
 import tokenRoutes from "./routes/token";
 

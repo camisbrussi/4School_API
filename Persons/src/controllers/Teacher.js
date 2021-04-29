@@ -37,119 +37,125 @@ class TeacherController {
                 });
             }
 
-            logger.info({
-                level: "info",
-                message: `Professor id: ${person.id} nome: ${person.name} registrado com sucesso`,
-                label: `Registrar, ${iduserlogged}, ${userlogged}`,
-            });
+      logger.info({
+        level: "info",
+        message: `Professor ${person.name} (id: ${person.id})registrado com sucesso`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
+      });
 
-            return res.json({success: "Registrado com sucesso"});
-        } catch (e) {
-            logger.error({
-                level: "error",
-                message: e.errors.map((err) => err.message),
-                label: `Registrar, ${iduserlogged}, ${userlogged}`,
-            });
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
-        }
+      return res.json({ success: "Registrado com sucesso" });
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Registro - ${userlogged}@${iduserlogged}`,
+      });
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
     }
+  }
 
-    async index(req, res) {
-        try {
-            const teachers = await Teacher.findAll({
-                attributes: ["id"],
-                include: [
-                    {
-                        model: Person,
-                        as: "person",
-                        attributes: ["id", "name", "cpf", "email", "birth_date"],
-                        include: [
-                            {
-                                model: PersonType,
-                                as: "type",
-                                attributes: ["id", "description"],
-                            },
-                            {
-                                model: Phone,
-                                as: "phones",
-                                attributes: ["id", "number", "is_whatsapp"],
-                            },
-                        ],
-                    },
-                    {
-                        model: TeacherStatus,
-                        as: "status",
-                        attributes: ["id", "description"],
-                    },
-                ],
-                order: ["status_id", [Person, "name", "asc"]],
-            });
+  async index(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
 
-            res.json(teachers);
-        } catch (e) {
-            logger.error({
-                level: "error",
-                message: e.errors.map((err) => err.message),
-                label: `Listar, ${iduserlogged}, ${userlogged}`,
-            });
-        }
+    try {
+      const teachers = await Teacher.findAll({
+        attributes: ["id"],
+        include: [
+          {
+            model: Person,
+            as: "person",
+            attributes: ["id", "name", "cpf", "email", "birth_date"],
+            include: [
+              {
+                model: PersonType,
+                as: "type",
+                attributes: ["id", "description"],
+              },
+              {
+                model: Phone,
+                as: "phones",
+                attributes: ["id", "number", "is_whatsapp"],
+              },
+            ],
+          },
+          {
+            model: TeacherStatus,
+            as: "status",
+            attributes: ["id", "description"],
+          },
+        ],
+        order: ["status_id", [Person, "name", "asc"]],
+      });
+
+      res.json(teachers);
+    } catch (e) {
+    const { userlogged, iduserlogged } = req.headers;
+
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Listar - ${userlogged}@${iduserlogged}`,
+      });
     }
+  }
 
-    async show(req, res) {
-        try {
-            const {id} = req.params;
-            if (!id) {
-                return res.status(400).json({
-                    errors: ["Missing ID"],
-                });
-            }
+  async show(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
 
-            const teacher = await Teacher.findByPk(id, {
-                attributes: ["id", "status_id"],
-                include: [
-                    {
-                        model: Person,
-                        as: "person",
-                        attributes: ["id", "name", "cpf", "email", "birth_date"],
-                        include: [
-                            {
-                                model: PersonType,
-                                as: "type",
-                                attributes: ["id", "description"],
-                            },
-                            {
-                                model: Phone,
-                                as: "phones",
-                                attributes: ["id", "number", "is_whatsapp"],
-                            },
-                        ],
-                    },
-                    {
-                        model: TeacherStatus,
-                        as: "status",
-                        attributes: ["id", "description"],
-                    },
-                ],
-            });
-            if (!teacher) {
-                return res.status(400).json({
-                    errors: ["Teacher does not exist"],
-                });
-            }
-            return res.json(teacher);
-        } catch (e) {
-            logger.error({
-                level: "error",
-                message: e.errors.map((err) => err.message),
-                label: `Buscar, ${iduserlogged}, ${userlogged}`,
-            });
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
-        }
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({
+          errors: ["Missing ID"],
+        });
+      }
+
+      const teacher = await Teacher.findByPk(id, {
+        attributes: ["id", "status_id"],
+        include: [
+          {
+            model: Person,
+            as: "person",
+            attributes: ["id", "name", "cpf", "email", "birth_date"],
+            include: [
+              {
+                model: PersonType,
+                as: "type",
+                attributes: ["id", "description"],
+              },
+              {
+                model: Phone,
+                as: "phones",
+                attributes: ["id", "number", "is_whatsapp"],
+              },
+            ],
+          },
+          {
+            model: TeacherStatus,
+            as: "status",
+            attributes: ["id", "description"],
+          },
+        ],
+      });
+      if (!teacher) {
+        return res.status(400).json({
+          errors: ["Teacher does not exist"],
+        });
+      }
+      return res.json(teacher);
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Buscar - ${userlogged}@${iduserlogged}`,
+      });
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
     }
+  }
 
     async update(req, res) {
         const {userlogged, iduserlogged} = req.headers;
@@ -204,70 +210,70 @@ class TeacherController {
                 where: {person_id: person.id},
             });
 
-            if (phones) {
-                await phones.map((v, k) => {
-                    let {number, is_whatsapp} = v;
-                    Phone.create({person_id: person.id, number, is_whatsapp});
-                });
-            }
+      if (phones) {
+        await phones.map((v, k) => {
+          let { number, is_whatsapp } = v;
+          Phone.create({ person_id: person.id, number, is_whatsapp });
+        });
+      }
+      
+      logger.info({
+        level: "info",
+        message: `Professor id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
+      });
 
-            logger.info({
-                level: "info",
-                message: `Professor id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-                label: `Editar, ${iduserlogged}, ${userlogged}`,
-            });
-
-            return res.json({success: "Editado com sucesso"});
-        } catch (e) {
-            logger.error({
-                level: "error",
-                message: e.errors.map((err) => err.message),
-                label: `Editar, ${iduserlogged}, ${userlogged}`,
-            });
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
-        }
+      return res.json({ success: "Editado com sucesso" });
+    } catch (e) {
+      logger.error({
+        level: "error",
+        message: e.errors.map((err) => err.message),
+        label: `Edição - ${userlogged}@${iduserlogged}`,
+      });
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
     }
+  }
 
     async delete(req, res) {
-        const {userlogged, iduserlogged} = req.headers;
+      const {userlogged, iduserlogged} = req.headers;
 
-        try {
-            const {id} = req.params;
+      try {
+        const {id} = req.params;
 
-            if (!id) {
-                return res.status(400).json({
-                    errors: ["Missing ID"],
-                });
-            }
-
-            const teacher = await Teacher.findByPk(id);
-            const person = await Person.findByPk(id);
-            if (!teacher) {
-                return res.status(400).json({
-                    errors: ["Teacher does not exist"],
-                });
-            }
-            await teacher.update({status_id: process.env.TEACHER_STATUS_INACTIVE});
-
-            logger.info({
-                level: "info",
-                message: `Professor inativado com sucesso id: ${id}, nome ${person.name}`,
-                label: `Deletar, ${iduserlogged}, ${userlogged}`,
-            });
-
-            return res.json("Teacher inactive");
-        } catch (e) {
-            logger.error({
-                level: "error",
-                message: e.errors.map((err) => err.message),
-                label: `Deletar, ${iduserlogged}, ${userlogged}`,
-            });
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
+        if (!id) {
+          return res.status(400).json({
+            errors: ["Missing ID"],
+          });
         }
+
+        const teacher = await Teacher.findByPk(id);
+        const person = await Person.findByPk(id);
+        if (!teacher) {
+          return res.status(400).json({
+            errors: ["Teacher does not exist"],
+          });
+        }
+        await teacher.update({status_id: process.env.TEACHER_STATUS_INACTIVE});
+
+        logger.info({
+          level: "info",
+          message: `Professor inativado com sucesso id: ${id}, nome ${person.name}`,
+          label: `Exclusão - ${userlogged}@${iduserlogged}`,
+        });
+
+        return res.json("Teacher inactive");
+      } catch (e) {
+        logger.error({
+          level: "error",
+          message: e.errors.map((err) => err.message),
+          label: `Exclusão - ${userlogged}@${iduserlogged}`,
+        });
+        return res.status(400).json({
+          errors: e.errors.map((err) => err.message),
+        });
+      }
     }
 
     async indexFilter(req, res) {

@@ -11,8 +11,8 @@ class PersonController {
 
       logger.info({
         level: "info",
-        message: `Pessoa id: ${newPerson.id} login: ${newPerson.name} registrada com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        message: `Pessoa ${newPerson.name} (id: ${newPerson.id}) registrada com sucesso`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Pessoa registrada com sucesso" });
@@ -20,7 +20,7 @@ class PersonController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -59,7 +59,7 @@ class PersonController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Busca - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -92,7 +92,7 @@ class PersonController {
       logger.info({
         level: "info",
         message: `Pessoa id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Editado com sucesso" });
@@ -100,7 +100,7 @@ class PersonController {
         logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
       
       return res.status(400).json({
@@ -110,13 +110,14 @@ class PersonController {
   }
 
   async delete(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
     try {
       return res.json("Pessoa não pode ser inativa");
     } catch (e) {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Inativação - ${userlogged}@${iduserlogged}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),

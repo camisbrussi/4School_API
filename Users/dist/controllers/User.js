@@ -7,6 +7,16 @@ class UserController {
     try {
       const { name, login, password } = req.body;
 
+      const user = await _user2.default.findOne({
+        where: { login }
+      });
+
+      if (user) {
+        return res.status(400).json({
+          error: ["Login já cadastrado"],
+        });
+      }
+
       const status_id = 1;
       const newUser = await _user2.default.create({
         name,
@@ -16,17 +26,18 @@ class UserController {
       });
 
       _logger2.default.info({
-        level: "info",
-        message: `Usuário id: ${newUser.id} login: ${newUsers.login} registrado com sucesso`,
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        level: "Info",
+        message: `Usuário ${newUser.login} (id: ${newUser.id})  registrado com sucesso`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Usuário registrado com sucesso" });
     } catch (e) {
+
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registro - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -47,7 +58,7 @@ class UserController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Listar, ${iduserlogged}, ${userlogged}`,
+        label: `Listar - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json(null);
@@ -64,7 +75,7 @@ class UserController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+        label: `Busca - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json(null);
@@ -105,7 +116,7 @@ class UserController {
       _logger2.default.info({
         level: "info",
         message: `Usuário id: ${user.id}, login: ${user.login} editado com sucesso - (name: ${newData.name} - login: ${newData.login})`,
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Usuário registrado com sucesso" });
@@ -113,7 +124,7 @@ class UserController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Editar, ${iduserlogged}, ${userlogged}`,
+        label: `Edição - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({
@@ -144,7 +155,7 @@ class UserController {
       _logger2.default.info({
         level: "info",
         message: `Usuário inativado com sucesso id: ${user.id}, login ${user.login}`,
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Inativação - ${userlogged}@${iduserlogged}`,
       });
 
       return res.json({ success: "Usuário inativo" });
@@ -152,7 +163,7 @@ class UserController {
       _logger2.default.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Inativação - ${userlogged}@${iduserlogged}`,
       });
 
       return res.status(400).json({

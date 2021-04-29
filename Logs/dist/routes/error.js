@@ -6,7 +6,8 @@ var _loginRequired = require('../middlewares/loginRequired'); var _loginRequired
 const router = new (0, _express.Router)();
 
 router.get('/', _Error2.default.index);
-router.get('/:data', _loginRequired2.default, _Error2.default.show);
+router.get('/show/:arquive', _Error2.default.show);
+router.post('/filter', _Error2.default.filterIndex);
 
 
 exports. default = router;

@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 import express from "express";
 import cors from 'cors';
 import helmet from 'helmet'
@@ -39,7 +40,7 @@ class App {
   }
 
   routes() {
-    this.app.use("/error/", errorRoutes);
+    this.app.use("/errors/", errorRoutes);
     this.app.use("/infos/", infoRoutes);
   }
 }
