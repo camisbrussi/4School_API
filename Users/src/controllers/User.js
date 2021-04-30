@@ -5,6 +5,7 @@ class UserController {
   async store(req, res) {
     const { userlogged, iduserlogged } = req.headers;
     try {
+      let erros = [];
       const { name, login, password } = req.body;
 
       const user = await User.findOne({
@@ -12,11 +13,18 @@ class UserController {
       });
 
       if (user) {
-        return res.status(400).json({
-          error: ["Login já cadastrado"],
-        });
+          erros.push("Login já cadastrado")
       }
 
+      if (password.length < 5 || password.length > 50) {
+        erros.push("Senha deve ser entre 6 e 50 caracteres")
+      }
+
+      if (erros.length) {
+        return res.json({success: 'Erro ao registrar usuário', erros});
+      }
+
+      else {
       const status_id = 1;
       const newUser = await User.create({
         name,
@@ -32,7 +40,8 @@ class UserController {
       });
 
       return res.json({ success: "Usuário registrado com sucesso" });
-    } catch (e) {
+     }
+    }catch (e) {
 
       logger.error({
         level: "error",
@@ -85,24 +94,57 @@ class UserController {
   async update(req, res) {
     const { userlogged, iduserlogged } = req.headers;
     try {
+      let erros = [];
+
       const { id } = req.params;
 
       if (!id) {
+        logger.error({
+          level: "error",
+          message: ["Id Missing"],
+          label: `Edição - ${userlogged}@${iduserlogged}`,
+        });
         return res.status(400).json({
-          errors: ["User does not exist"],
+          errors: ["Id Missing"],
         });
       }
+
       const user = await User.findByPk(id);
 
       if (!user) {
+        logger.error({
+          level: "error",
+          message: ["User does not exist"],
+          label: `Edição - ${userlogged}@${iduserlogged}`,
+        });
         return res.status(400).json({
           errors: ["User does not exist"],
         });
       }
-
       const { name, login, password, status_id } = req.body;
 
-      let newData;
+      const loginExists = await User.findOne({
+        where: { login }
+      });
+
+    if(loginExists){
+      if (loginExists && loginExists.login != user.login ) {
+      erros.push("Login já cadastrado")
+      }
+  }
+
+    if(password){
+      if (password.length < 5 || password.length > 50) {
+        console.log(password)
+        erros.push("Senha deve ser entre 6 e 50 caracteres")
+      }
+    }
+
+    if (erros.length) {
+      return res.json({success: 'Erro ao editar usuário', erros});
+    }
+    else {
+    let newData;
 
       if (password) newData = await user.update(req.body);
       else {
@@ -113,20 +155,22 @@ class UserController {
         });
       }
 
-      logger.info({
-        level: "info",
-        message: `Usuário id: ${user.id}, login: ${user.login} editado com sucesso - (name: ${newData.name} - login: ${newData.login})`,
-        label: `Edição - ${userlogged}@${iduserlogged}`,
-      });
-
-      return res.json({ success: "Usuário registrado com sucesso" });
+        logger.info({
+          level: "info",
+          message: `Usuário id: ${user.id}, login: ${user.login} editado com sucesso - (name: ${newData.name} - login: ${newData.login})`,
+          label: `Edição - ${userlogged}@${iduserlogged}`,
+        });
+  
+        return res.json({ success: "Usuário registrado com sucesso" });
+      
+      }
     } catch (e) {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
         label: `Edição - ${userlogged}@${iduserlogged}`,
       });
-
+      console.log(error)
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
