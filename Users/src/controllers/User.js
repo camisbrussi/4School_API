@@ -9,40 +9,44 @@ class UserController {
       const { name, login, password } = req.body;
 
       const user = await User.findOne({
-        where: { login }
+        where: { login },
       });
 
       if (user) {
-          erros.push("Login já cadastrado")
+        erros.push("Login já cadastrado");
+      }
+      if (name.length < 3 || name.length > 50) {
+        erros.push("Nome deve ter entre 3 e 50 caracteres");
+      }
+
+      if (login.length < 3 || login.length > 50) {
+        erros.push("Login deve ter entre 3 e 50 caracteres");
       }
 
       if (password.length < 5 || password.length > 50) {
-        erros.push("Senha deve ser entre 6 e 50 caracteres")
+        erros.push("Senha deve ser entre 6 e 50 caracteres");
       }
 
       if (erros.length) {
-        return res.json({success: 'Erro ao registrar usuário', erros});
+        return res.json({ success: "Erro ao registrar usuário", erros });
+      } else {
+        const status_id = 1;
+        const newUser = await User.create({
+          name,
+          login,
+          password,
+          status_id,
+        });
+
+        logger.info({
+          level: "Info",
+          message: `Usuário ${newUser.login} (id: ${newUser.id})  registrado com sucesso`,
+          label: `Registro - ${userlogged}@${iduserlogged}`,
+        });
+
+        return res.json({ success: "Usuário registrado com sucesso" });
       }
-
-      else {
-      const status_id = 1;
-      const newUser = await User.create({
-        name,
-        login,
-        password,
-        status_id,
-      });
-
-      logger.info({
-        level: "Info",
-        message: `Usuário ${newUser.login} (id: ${newUser.id})  registrado com sucesso`,
-        label: `Registro - ${userlogged}@${iduserlogged}`,
-      });
-
-      return res.json({ success: "Usuário registrado com sucesso" });
-     }
-    }catch (e) {
-
+    } catch (e) {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
@@ -124,45 +128,50 @@ class UserController {
       const { name, login, password, status_id } = req.body;
 
       const loginExists = await User.findOne({
-        where: { login }
+        where: { login },
       });
 
-    if(loginExists){
-      if (loginExists && loginExists.login != user.login ) {
-      erros.push("Login já cadastrado")
+      if (loginExists) {
+        if (loginExists && loginExists.login != user.login) {
+          erros.push("Login já cadastrado");
+        }
       }
-  }
 
-    if(password){
-      if (password.length < 5 || password.length > 50) {
-        console.log(password)
-        erros.push("Senha deve ser entre 6 e 50 caracteres")
+      if (password) {
+        if (password.length < 5 || password.length > 50) {
+          erros.push("Senha deve ser entre 6 e 50 caracteres");
+        }
       }
-    }
 
-    if (erros.length) {
-      return res.json({success: 'Erro ao editar usuário', erros});
-    }
-    else {
-    let newData;
-
-      if (password) newData = await user.update(req.body);
-      else {
-        newData = await user.update({
-          status_id,
-          name,
-          login,
-        });
+      if (name.length < 3 || name.length > 50) {
+        erros.push("Nome deve ter entre 3 e 50 caracteres");
       }
+
+      if (login.length < 3 || login.length > 50) {
+        erros.push("Login deve ter entre 3 e 50 caracteres");
+      }
+
+      if (erros.length) {
+        return res.json({ success: "Erro ao editar usuário", erros });
+      } else {
+        let newData;
+
+        if (password) newData = await user.update(req.body);
+        else {
+          newData = await user.update({
+            status_id,
+            name,
+            login,
+          });
+        }
 
         logger.info({
           level: "info",
           message: `Usuário id: ${user.id}, login: ${user.login} editado com sucesso - (name: ${newData.name} - login: ${newData.login})`,
           label: `Edição - ${userlogged}@${iduserlogged}`,
         });
-  
+
         return res.json({ success: "Usuário registrado com sucesso" });
-      
       }
     } catch (e) {
       logger.error({
@@ -170,7 +179,7 @@ class UserController {
         message: e.errors.map((err) => err.message),
         label: `Edição - ${userlogged}@${iduserlogged}`,
       });
-      console.log(error)
+      console.log(error);
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });

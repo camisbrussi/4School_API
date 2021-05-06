@@ -10,50 +10,88 @@ import PersonType from "../models/person_type";
 import Phone from "../models/phone";
 
 class ActivityController {
-    async store(req, res) {
-        const {userlogged, iduserlogged} = req.headers;
-        try {
-            const {
-                name,
-                description,
-                start,
-                end,
-                generate_certificate,
-                vacancies,
-            } = req.body;
-
-            const status_id = 1;
-
-      const newActivity = await Activity.create({
-        name,
-        description,
-        start,
-        end,
-        generate_certificate,
-        vacancies,
-        status_id,
-      });
+  async store(req, res) {
+  
+    const {userlogged, iduserlogged} = req.headers;
+  
+    try {
+        let erros = [];
       
-      logger.info({
-        level: "info",
-        message: `Atividade ${newActivity.name} (id: ${newActivity.id} registrada com sucesso)`,
-        label: `Registro - ${userlogged}@${iduserlogged}`,
-      });
+        const { name, description, start, end, generate_certificate, vacancies } = req.body;
 
-            return res.json({success: "Atividade Registrada com sucesso"});
-        } catch (e) {
+        const status_id = 1;
 
+
+        if (name.length < 3 || name.length > 50) {
+          erros.push("Nome da atividade deve ter entre 3 e 50 caracteres");
+        }
+
+        var dateEnd;
+        var dateStart;
+
+        if(!start){
+          erros.push("Data de Inicio deve ser preenchida ");
+        } else {
+          var dateStart = new Date(start)
+        }
+
+        if(!end){
+          erros.push("Data de Fim deve ser preenchida ");
+        } else {
+          dateEnd = new Date(end)
+        }
+        
+        if(dateStart < new Date()){
+          erros.push("Data de Inicio deve ser maior que a data atual ");
+        }
+
+        if(dateEnd < new Date()){
+          erros.push("Data de Fim deve ser maior que a atual ");
+        }
+
+        if(dateEnd < dateStart){
+          erros.push("Data de Fim deve ser maior que a Data de Início");
+        }
+
+        if(!vacancies){
+          erros.push("Número de vagas deve ser preenchido");
+        }
+
+        if (erros.length) {
+          return res.json({ success: "Erro ao registrar usuário", erros });
+        } else {
+
+        const newActivity = await Activity.create({
+          name,
+          description,
+          start,
+          end,
+          generate_certificate,
+          vacancies,
+          status_id,
+        });
+
+        logger.info({
+          level: "info",
+          message: `Atividade ${newActivity.name} (id: ${newActivity.id} registrada com sucesso)`,
+          label: `Registro - ${userlogged}@${iduserlogged}`,
+        });
+
+        return res.json({success: "Atividade Registrada com sucesso"});
+      }
+    } catch (e) {
+console.log(e)
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
         label: `Registro - ${userlogged}@${iduserlogged}`,
-      });
+    });
 
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
-        }
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
     }
+  }
 
     async index(req, res) {
         const {userlogged, iduserlogged} = req.headers;

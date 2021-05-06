@@ -10,7 +10,6 @@ exports. default = (req, res, next) => {
   }
 
   const [, token] = authorization.split(' ');
-  console.log('TOKEN'+token);
   try{
     const data = _jsonwebtoken2.default.verify(token, process.env.TOKEN_SECRET);
     const { id, login } = data;
