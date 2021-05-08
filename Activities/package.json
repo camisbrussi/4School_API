@@ -1,5 +1,5 @@
 {
-  "name": "API",
+  "name": "activities",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,6 +14,8 @@
   "license": "ISC",
   "devDependencies": {
     "eslint-plugin-import": "^2.22.1",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
     "nodemon": "^2.0.7",
     "sucrase": "^3.17.1"
   },
@@ -42,7 +44,7 @@
     }
   },
   "lint-staged": {
-    "./src/**/*.{js,jsx}":[
+    "./src/**/*.{js,jsx}": [
       "npm format"
     ]
   }
