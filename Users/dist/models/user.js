@@ -14,8 +14,8 @@ var _bcryptjs = require('bcryptjs'); var _bcryptjs2 = _interopRequireDefault(_bc
           defaultValue: "",
           validate: {
             len: {
-              args: [2, 45],
-              msg: "Name field must be between 3 and 45 characters",
+              args: [3, 80],
+              msg: "Nome deve ter entre 3 e 50 caracteres",
             },
           },
         },
@@ -23,12 +23,12 @@ var _bcryptjs = require('bcryptjs'); var _bcryptjs2 = _interopRequireDefault(_bc
           type: _sequelize2.default.STRING,
           defaultValue: "",
           unique: {
-            msg: "Login already exists",
+            msg: "Login já cadastrado",
           },
           validate: {
             len: {
               args: [2, 45],
-              msg: "Login field must be between 3 and 255 characters",
+              msg: "Login deve ter entre 3 e 50 caracteres",
             },
           },
         },
@@ -42,7 +42,7 @@ var _bcryptjs = require('bcryptjs'); var _bcryptjs2 = _interopRequireDefault(_bc
           validate: {
             len: {
               args: [6, 50],
-              msg: "Password must be between 6 and 50 characters",
+              msg: "Senha deve ser entre 6 e 50 caracteres",
             },
           },
         },

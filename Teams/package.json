@@ -29,5 +29,21 @@
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0",
     "winston": "^3.3.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": [
+        "lint-staged",
+        "npm build"
+      ],
+      "post-merge": [
+        "npm i"
+      ]
+    }
+  },
+  "lint-staged": {
+    "./src/**/*.{js,jsx}":[
+      "npm format"
+    ]
   }
 }

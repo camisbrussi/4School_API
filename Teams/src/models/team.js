@@ -19,7 +19,7 @@ export default class team extends Model {
           validate: { 
             len: { 
               args: [3, 80],
-              msg: "Name field must be between 3 and 80 characters", 
+              msg: "Nome deve ter entre 3 e 80 caracteres", 
             }, 
           }, 
         }, 

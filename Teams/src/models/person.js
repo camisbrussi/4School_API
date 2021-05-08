@@ -14,7 +14,7 @@ export default class person extends Model {
                     validate: {
                         len: {
                             args: [3, 80],
-                            msg: "Name field must be between 3 and 80 characters",
+                            msg: "Nome deve ter entre 3 e 80 caracteres",
                         },
                     },
                 },
@@ -24,7 +24,7 @@ export default class person extends Model {
                     validate: {
                         len: {
                             args: [11, 11],
-                            msg: "CPF field must be 11 characters",
+                            msg: "Digite um número de CPF válido",
                         },
                     },
                 },
@@ -34,7 +34,7 @@ export default class person extends Model {
                     validate: {
                         len: {
                             args: [5, 100],
-                            msg: "E-mail field must be between 5 and 100 characters",
+                            msg: "Digite um Email válido",
                         },
                     },
                 },

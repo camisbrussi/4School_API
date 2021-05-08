@@ -11,7 +11,7 @@ export default class phone extends Model {
                     validate: {
                         len: {
                             args: [10, 11],
-                            msg: "Number field must be between 10 and 11 characters",
+                            msg: "Número deve ter entre 10 e 11 caracteres",
                         },
                     },
                 },
