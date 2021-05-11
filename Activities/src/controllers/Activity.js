@@ -421,7 +421,7 @@ class ActivityController {
 
       //- E agora salvamos os participantes da atividade
       for (let i = 0; i < participants.length; i++) {
-        let person_id = participants[i].person.id;
+        let person_id = participants[i].id;
         let activity_id = activity.id;
         let registration_date = new Date().toISOString().slice(0, 19);
         let number_ticktes = 1;

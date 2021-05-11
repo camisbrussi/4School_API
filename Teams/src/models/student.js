@@ -17,5 +17,7 @@ export default class student extends Model {
         this.belongsTo(models.person, {foreignKey:"person_id", as:"person"});
         this.belongsTo(models.responsible, {foreignKey:"responsible_id", as:"responsible"});
         this.belongsTo(models.student_status, {foreignKey:"status_id", as:"status"});
+
+        this.hasMany(models.team_has_student, {foreignKey:"student_id"});
     }
 }
