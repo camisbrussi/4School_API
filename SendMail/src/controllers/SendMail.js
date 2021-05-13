@@ -1,5 +1,4 @@
-
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 require("dotenv").config();
 dotenv.config();
 
@@ -8,13 +7,28 @@ import Person from "../models/person";
 import logger from "../logger";
 import { sender } from "../config/emailConfig";
 
-
 class SendMailController {
-  async index(req, res) {}
+  async index(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+    try {
+      const send = await Message.findAll({
+        order: ["message"],
+      });
+
+      return res.json(send);
+    } catch (e) {
+      logger.error({
+        level: "error",
+        messages: e.errors.map((err) => err.messages),
+        label: `Listar - ${userlogged}@${iduserlogged}`,
+      });
+
+      return res.json(null);
+    }
+  }
 
   async send(req, res) {
     try {
-      console.log("cheguei");
       const registration_log = await Message.findOne({
         where: { email_sent: 0 },
         //para whats tratar isso
@@ -24,11 +38,11 @@ class SendMailController {
 
       const registration = await Message.findByPk(registration_log.id);
 
-      if (!registration) 
+      if (!registration)
         return res.status(400).json({ error: "Mensagem não encontrada" });
 
       const person = await Person.findByPk(registration.person_id);
- 
+
       if (!person)
         return res.status(400).json({ error: "Pessoa não encontrado" });
 
@@ -39,26 +53,28 @@ class SendMailController {
         text: registration.message,
       };
 
-      console.log(mailOption);
-      sender.sendMail(mailOption, function (error, info) {
-        if (error) {
-          return res.json({ error: "Não foi possível enviar o e-mail" });
-        }
-      });
-
       await Message.update(
         {
           email_sent: 1,
         },
         {
           where: { id: registration_log.id },
-        }
+        },
+        console.log(Message)
       );
 
-      return res.json({ success: "Email enviado com sucesso" });
+      sender.sendMail(mailOption, function (error, info) {
+        if (error) {
+          console.log(error);
+          return res.status(400).json({ error: "Não foi possível enviar o e-mail" });
+        } else {
+          return res.status(200).json({ success: "Email enviado com sucesso" });
+        }
+      });
+      
     } catch (e) {
       console.log(e);
-      return res.status(400).json({
+      return res.json({
         errors: e.errors.map((err) => err.message),
       });
     }
@@ -99,7 +115,6 @@ class SendMailController {
         });
       else return res.json({ success: "Enviado com sucesso" });
     } catch (e) {
-      console.log(e);
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
