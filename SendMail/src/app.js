@@ -16,9 +16,9 @@ import sendMailRoutes from "./routes/sendmail";
 
 const whiteList = [
   'http://localhost:3000',
-  'http://localhost:3020',
+  'http://localhost:3005',
   'http://177.44.248.32:8080',
- // 'http://177.44.248.32:8082'
+  'http://177.44.248.32:8085'
 ]
 
 const corsOptions = {
