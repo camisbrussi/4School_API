@@ -14,7 +14,7 @@ export default class activity_has_participant extends Model {
                     defaultValue: "",
                 },
                 registration_date: {
-                    type: Sequelize.DATE,
+                    type: Sequelize.DATEONLY,
                     defaultValue: "",
                 },
                 number_tickets: {
@@ -22,12 +22,10 @@ export default class activity_has_participant extends Model {
                     defaultValue: "1",
                 },
                 participation_date: {
-                    type: Sequelize.DATE,
-                    defaultValue: "",
+                    type: Sequelize.DATEONLY,
                 },
                 number_participation: {
                     type: Sequelize.INTEGER,
-                    defaultValue: "",
                 },
             },
             {
