@@ -7,7 +7,29 @@ class PersonController {
     async store(req, res) {
         const {userlogged, iduserlogged} = req.headers;
         try {
+            let erros = [];
             const {type, name, cpf, email, birth_date} = req.body;
+
+            const cpfUnformatted = cpf
+            .replace('.', '')
+            .replace('.', '')
+            .replace('-', '');
+
+            const cpfExists = await Person.findOne({
+                where: { cpf: cpfUnformatted },
+              });
+        
+              if (cpfExists) {
+                erros.push('CPF já cadastrado');
+              }
+        
+              if(!cpfIsValid.isValid(cpfUnformatted)) {
+                erros.push('Digite um CPF válido');
+              }
+        
+              if (erros.length) {
+                return res.json({ success: 'Erro ao registrar professor', erros });
+              } else{
 
             const newPerson = await Person.create({type, name, cpf, email, birth_date});
 
@@ -18,6 +40,7 @@ class PersonController {
             });
 
             return res.json({success: "Pessoa registrada com sucesso"});
+        }
         } catch (e) {
             logger.error({
                 level: "error",
@@ -25,9 +48,10 @@ class PersonController {
                 label: `Registro - ${userlogged}@${iduserlogged}`,
             });
 
-            return res.status(400).json({
-                errors: e.errors.map((err) => err.message),
-            });
+            return res.json({
+                success: 'Erro ao registrar professor',
+                erros: e.errors.map((err) => err.message),
+              });
         }
     }
 

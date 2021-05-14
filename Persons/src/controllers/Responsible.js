@@ -31,7 +31,7 @@ class ResponsibleController {
 
       if (cpfExists) {
         erros.push('CPF já cadastrado');
-      }S
+      }
 
       if (!cpfIsValid.isValid(cpfUnformatted)) {
         erros.push('Digite um CPF válido');
