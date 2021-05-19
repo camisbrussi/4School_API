@@ -8,35 +8,50 @@ dotenv.config();
 import Teacher from '../models/teacher';
 import TeacherStatus from '../models/teacher_status';
 import Person from '../models/person';
+import Address from '../models/adress';
 import PersonType from '../models/person_type';
 import Phone from '../models/phone';
 import { Op } from 'sequelize';
+import { Unformatted } from '../util/unformatted';
 
 class TeacherController {
   async store(req, res) {
+    
     const { userlogged, iduserlogged } = req.headers;
 
     try {
+      
       let erros = [];
-
-      const { name, cpf, email, birth_date, phones, password } = req.body;
+      
+      const {
+        name,
+        cpf,
+        email,
+        birth_date,
+        phones,
+        password,
+        cep,
+        address,
+        number,
+        complement,
+        district,
+        city_id,
+      } = req.body;
+      
       const type_id = process.env.TEACHER_PERSON_TYPE;
       const status_id = process.env.TEACHER_STATUS_ACTIVE;
-
-      const cpfUnformatted = cpf
-        .replace('.', '')
-        .replace('.', '')
-        .replace('-', '');
+      console.log("chegou")
+      console.log('CPF' + Unformatted(cpf));
 
       const cpfExists = await Person.findOne({
-        where: { cpf: cpfUnformatted },
+        where: { cpf: Unformatted(cpf) },
       });
 
       if (cpfExists) {
         erros.push('CPF já cadastrado');
       }
 
-      if(!cpfIsValid.isValid(cpfUnformatted)) {
+      if (!cpfIsValid.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
       }
 
@@ -46,21 +61,30 @@ class TeacherController {
         const person = await Person.create({
           type_id,
           name,
-          cpf: cpfUnformatted,
+          cpf: Unformatted(cpf),
           email,
           birth_date,
         });
         const person_id = person.id;
         await Teacher.create({ person_id, status_id, password });
+        await Address.create({
+          cep: Unformatted(cep),
+          address,
+          number,
+          complement,
+          district,
+          city_id,
+          person_id,
+        });
 
         if (phones) {
           phones.map((v, k) => {
             let { number, is_whatsapp } = v;
-            const numberUnformatted = number
-            .replace('(', '' )
-            .replace(')', '')
-            .replace('-', '')
-            Phone.create({ person_id, number: numberUnformatted, is_whatsapp });
+            Phone.create({
+              person_id,
+              number: Unformatted(number),
+              is_whatsapp,
+            });
           });
         }
 
@@ -73,7 +97,7 @@ class TeacherController {
         return res.json({ success: 'Registrado com sucesso' });
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
@@ -158,6 +182,19 @@ class TeacherController {
                 as: 'phones',
                 attributes: ['id', 'number', 'is_whatsapp'],
               },
+              {
+                model: Address,
+                as: 'address',
+                attributes: [
+                  'id',
+                  'address',
+                  'number',
+                  'complement',
+                  'district',
+                  'cep',
+                  'city_id',
+                ],
+              },
             ],
           },
           {
@@ -174,6 +211,7 @@ class TeacherController {
       }
       return res.json(teacher);
     } catch (e) {
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
@@ -201,6 +239,12 @@ class TeacherController {
         birth_date,
         phones,
         password,
+        cep,
+        address,
+        number,
+        complement,
+        district,
+        city_id,
         isActive,
       } = req.body;
 
@@ -224,27 +268,21 @@ class TeacherController {
         });
       }
 
-      const cpfUnformatted = cpf
-        .replace('.', '')
-        .replace('.', '')
-        .replace('-', '');
-
       const cpfExists = await Person.findOne({
-        where: { cpf: cpfUnformatted },
+        where: { cpf: Unformatted(cpf) },
       });
 
-      if (cpfExists && cpfUnformatted != person.cpf) {
+      if (cpfExists && Unformatted(cpf) != person.cpf) {
         erros.push('CPF já cadastrado');
       }
 
-      if(!cpfIsValid.isValid(cpfUnformatted)) {
+      if (!cpfIsValid.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
       }
 
       if (erros.length) {
         return res.json({ success: 'Erro ao registrar usuário', erros });
       } else {
-
         if (isActive !== undefined)
           status_id =
             isActive === true
@@ -257,7 +295,7 @@ class TeacherController {
         }
         const newData = await person.update({
           name,
-          cpf: cpfUnformatted,
+          cpf: Unformatted(cpf),
           email,
           birth_date,
         });
@@ -270,13 +308,31 @@ class TeacherController {
           phones.map((v, k) => {
             let { number, is_whatsapp } = v;
             const numberUnformatted = number
-            .replace('(', '' )
-            .replace(')', '')
-            .replace('-', '')
-            console.log(numberUnformatted)
-            Phone.create({ person_id: person.id, number: numberUnformatted, is_whatsapp });
+              .replace('(', '')
+              .replace(')', '')
+              .replace('-', '');
+            console.log(numberUnformatted);
+            Phone.create({
+              person_id: person.id,
+              number: numberUnformatted,
+              is_whatsapp,
+            });
           });
         }
+
+        await Address.destroy({
+          where: { person_id: person.id },
+        });
+
+        await Address.create({
+          cep: Unformatted(cep),
+          address,
+          number,
+          complement,
+          district,
+          city_id,
+          person_id: teacher.person_id,
+        });
 
         logger.info({
           level: 'info',
@@ -287,7 +343,6 @@ class TeacherController {
         return res.json({ success: 'Editado com sucesso' });
       }
     } catch (e) {
-      console.log(e)
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),

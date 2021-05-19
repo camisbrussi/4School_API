@@ -9,9 +9,11 @@ import Student from '../models/student';
 import StudentStatus from '../models/student_status';
 import Responsible from '../models/responsible';
 import Person from '../models/person';
+import Address from '../models/adress';
 import PersonType from '../models/person_type';
 import Phone from '../models/phone';
 import { Op } from 'sequelize';
+import { Unformatted } from '../util/unformatted';
 
 class StudentController {
   async store(req, res) {
@@ -20,24 +22,32 @@ class StudentController {
     try {
       let erros = [];
 
-      const { responsible_id, name, cpf, email, birth_date, phones } = req.body;
+      const {
+        responsible_id,
+        name,
+        cpf,
+        email,
+        birth_date,
+        phones,
+        cep,
+        address,
+        number,
+        complement,
+        district,
+        city_id,
+      } = req.body;
       const type_id = process.env.STUDENT_PERSON_TYPE;
       const status_id = process.env.STUDENT_STATUS_ACTIVE;
 
-      const cpfUnformatted = cpf
-        .replace('.', '')
-        .replace('.', '')
-        .replace('-', '');
-
       const cpfExists = await Person.findOne({
-        where: { cpf: cpfUnformatted },
+        where: { cpf: Unformatted(cpf) },
       });
 
       if (cpfExists) {
         erros.push('CPF já cadastrado');
       }
 
-      if (!cpfIsValid.isValid(cpfUnformatted)) {
+      if (!cpfIsValid.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
       }
 
@@ -47,12 +57,22 @@ class StudentController {
         const person = await Person.create({
           type_id,
           name,
-          cpf: cpfUnformatted,
+          cpf: Unformatted(cpf),
           email,
           birth_date,
         });
         const person_id = person.id;
         await Student.create({ person_id, responsible_id, status_id });
+
+        await Address.create({
+          cep: Unformatted(cep),
+          address,
+          number,
+          complement,
+          district,
+          city_id,
+          person_id,
+        });
 
         if (phones) {
           phones.map((v, k) => {
@@ -126,6 +146,19 @@ class StudentController {
                     model: Phone,
                     as: 'phones',
                     attributes: ['id', 'number', 'is_whatsapp'],
+                  },
+                  {
+                    model: Address,
+                    as: 'address',
+                    attributes: [
+                      'id',
+                      'address',
+                      'number',
+                      'complement',
+                      'district',
+                      'cep',
+                      'city_id',
+                    ],
                   },
                 ],
               },
@@ -337,6 +370,19 @@ class StudentController {
                 as: 'phones',
                 attributes: ['id', 'number', 'is_whatsapp'],
               },
+              {
+                model: Address,
+                as: 'address',
+                attributes: [
+                  'id',
+                  'address',
+                  'number',
+                  'complement',
+                  'district',
+                  'cep',
+                  'city_id',
+                ],
+              },
             ],
           },
           {
@@ -402,6 +448,12 @@ class StudentController {
         email,
         birth_date,
         phones,
+        cep,
+        address,
+        number,
+        complement,
+        district,
+        city_id,
         isActive,
       } = req.body;
       if (!id) {
@@ -425,27 +477,27 @@ class StudentController {
         });
       }
 
-      const cpfUnformatted = cpf
-        .replace('.', '')
-        .replace('.', '')
-        .replace('-', '');
-
       const cpfExists = await Person.findOne({
-        where: { cpf: cpfUnformatted },
+        where: { cpf: Unformatted(cpf) },
       });
 
-      if (cpfExists && cpfUnformatted != person.cpf) {
+      if (cpfExists && Unformatted(cpf) != person.cpf) {
         erros.push('CPF já cadastrado');
       }
 
-      if (!cpfIsValid.isValid(cpfUnformatted)) {
+      if (!cpfIsValid.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
       }
 
       if (erros.length) {
         return res.json({ success: 'Erro ao registrar responsável', erros });
       } else {
-        const newData = await person.update({ name, cpf: cpfUnformatted, email, birth_date });
+        const newData = await person.update({
+          name,
+          cpf: Unformatted(cpf),
+          email,
+          birth_date,
+        });
 
         if (isActive !== undefined)
           status_id =
@@ -457,13 +509,26 @@ class StudentController {
         await Phone.destroy({
           where: { person_id: person.id },
         });
-
         if (phones) {
           await phones.map((v, k) => {
             let { number, is_whatsapp } = v;
             Phone.create({ person_id: person.id, number, is_whatsapp });
           });
         }
+
+        await Address.destroy({
+          where: { person_id: person.id },
+        });
+
+        await Address.create({
+          cep: Unformatted(cep),
+          address,
+          number,
+          complement,
+          district,
+          city_id,
+          person_id: student.person_id,
+        });
 
         logger.info({
           level: 'info',
@@ -474,6 +539,7 @@ class StudentController {
         return res.json({ success: 'Editado com sucesso' });
       }
     } catch (e) {
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),

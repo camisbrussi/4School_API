@@ -8,7 +8,9 @@ dotenv.config();
 import Responsible from '../models/responsible';
 import Person from '../models/person';
 import PersonType from '../models/person_type';
+import Address from '../models/adress';
 import Phone from '../models/phone';
+import { Unformatted } from '../util/unformatted';
 
 class ResponsibleController {
   async store(req, res) {
@@ -17,23 +19,31 @@ class ResponsibleController {
     try {
       let erros = [];
 
-      const { name, cpf, email, birth_date, phones, password } = req.body;
+      const {
+        name,
+        cpf,
+        email,
+        birth_date,
+        phones,
+        password,
+        cep,
+        address,
+        number,
+        complement,
+        district,
+        city_id,
+      } = req.body;
       const type_id = process.env.RESPONSIBLE_PERSON_TYPE;
 
-      const cpfUnformatted = cpf
-        .replace('.', '')
-        .replace('.', '')
-        .replace('-', '');
-
       const cpfExists = await Person.findOne({
-        where: { cpf: cpfUnformatted },
+        where: { cpf: Unformatted(cpf) },
       });
 
       if (cpfExists) {
         erros.push('CPF já cadastrado');
       }
 
-      if (!cpfIsValid.isValid(cpfUnformatted)) {
+      if (!cpfIsValid.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
       }
 
@@ -43,7 +53,7 @@ class ResponsibleController {
         const person = await Person.create({
           type_id,
           name,
-          cpf: cpfUnformatted,
+          cpf: Unformatted(cpf),
           email,
           birth_date,
         });
@@ -54,14 +64,24 @@ class ResponsibleController {
           { logging: console.log }
         );
 
+        await Address.create({
+          cep: Unformatted(cep),
+          address,
+          number,
+          complement,
+          district,
+          city_id,
+          person_id,
+        });
+
         if (phones) {
           phones.map((v, k) => {
             let { number, is_whatsapp } = v;
-            const numberUnformatted = number
-              .replace('(', '')
-              .replace(')', '')
-              .replace('-', '');
-            Phone.create({ person_id, number: numberUnformatted, is_whatsapp });
+            Phone.create({
+              person_id,
+              number: Unformatted(number),
+              is_whatsapp,
+            });
           });
         }
 
@@ -157,6 +177,19 @@ class ResponsibleController {
                 as: 'phones',
                 attributes: ['id', 'number', 'is_whatsapp'],
               },
+              {
+                model: Address,
+                as: 'address',
+                attributes: [
+                  'id',
+                  'address',
+                  'number',
+                  'complement',
+                  'district',
+                  'cep',
+                  'city_id',
+                ],
+              },
             ],
           },
         ],
@@ -185,7 +218,20 @@ class ResponsibleController {
       const { id } = req.params;
 
       let erros = [];
-      const { name, cpf, email, birth_date, phones, password } = req.body;
+      const {
+        name,
+        cpf,
+        email,
+        birth_date,
+        phones,
+        password,
+        cep,
+        address,
+        number,
+        complement,
+        district,
+        city_id,
+      } = req.body;
 
       if (!id) {
         return res.status(400).json({
@@ -207,51 +253,65 @@ class ResponsibleController {
         });
       }
 
-      const cpfUnformatted = cpf
-        .replace('.', '')
-        .replace('.', '')
-        .replace('-', '');
-
       const cpfExists = await Person.findOne({
-        where: { cpf: cpfUnformatted },
+        where: { cpf: Unformatted(cpf) },
       });
 
-      if (cpfExists && cpfUnformatted != person.cpf) {
+      if (cpfExists && Unformatted(cpf) != person.cpf) {
         erros.push('CPF já cadastrado');
       }
 
-      if (!cpfIsValid.isValid(cpfUnformatted)) {
+      if (!cpfIsValid.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
       }
 
       if (erros.length) {
         return res.json({ success: 'Erro ao registrar responsável', erros });
       } else {
-        const newData = await person.update({ name, cpf: cpfUnformatted, email, birth_date });
-
-      if (password) {
-        await responsible.update({ password });
-      }
-
-      await Phone.destroy({
-        where: { person_id: person.id },
-      });
-
-      if (phones) {
-        await phones.map((v, k) => {
-          let { number, is_whatsapp } = v;
-          Phone.create({ person_id: person.id, number, is_whatsapp });
+        const newData = await person.update({
+          name,
+          cpf: Unformatted(cpf),
+          email,
+          birth_date,
         });
+
+        if (password) {
+          await responsible.update({ password });
+        }
+
+        await Phone.destroy({
+          where: { person_id: person.id },
+        });
+
+        if (phones) {
+          await phones.map((v, k) => {
+            let { number, is_whatsapp } = v;
+            Phone.create({ person_id: person.id, number, is_whatsapp });
+          });
+        }
+
+        await Address.destroy({
+          where: { person_id: person.id },
+        });
+
+        await Address.create({
+          cep: Unformatted(cep),
+          address,
+          number,
+          complement,
+          district,
+          city_id,
+          person_id: responsible.person_id,
+        });
+
+        logger.info({
+          level: 'info',
+          message: `Responsável id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
+          label: `Edição - ${userlogged}@${iduserlogged}`,
+        });
+
+        return res.json({ success: 'Editado com sucesso' });
       }
-
-      logger.info({
-        level: 'info',
-        message: `Responsável id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-        label: `Edição - ${userlogged}@${iduserlogged}`,
-      });
-
-      return res.json({ success: 'Editado com sucesso' });
-    }
     } catch (e) {
       logger.error({
         level: 'error',
