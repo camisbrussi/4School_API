@@ -13,6 +13,7 @@ import personRoutes from "./routes/person";
 import teacherRoutes from "./routes/teacher";
 import responsibleRoutes from "./routes/responsible";
 import studentRoutes from "./routes/student";
+import addressRoutes from "./routes/address"
 
 
 const whiteList = [
@@ -52,6 +53,7 @@ class App {
     this.app.use("/teachers/", teacherRoutes);
     this.app.use("/responsibles/", responsibleRoutes);
     this.app.use("/students/", studentRoutes);
+    this.app.use("/address/", addressRoutes);
   }
 }
 

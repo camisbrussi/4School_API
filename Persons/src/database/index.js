@@ -9,8 +9,10 @@ import Phone from '../models/phone';
 import Responsible from '../models/responsible';
 import Student from '../models/student';
 import Student_status from '../models/student_status';
+import City from '../models/adress';
+import Address from '../models/city';
 
-const models = [Person, Person_type, Teacher, Teacher_status, Phone, Responsible, Student, Student_status];
+const models = [Person, Person_type, Teacher, Teacher_status, Phone, Responsible, Student, Student_status, Address, City];
 const connection = new Sequelize(databaseConfig);
 
 connectionDb();
