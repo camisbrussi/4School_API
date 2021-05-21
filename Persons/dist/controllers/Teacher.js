@@ -23,20 +23,16 @@ class TeacherController {
       const type_id = process.env.TEACHER_PERSON_TYPE;
       const status_id = process.env.TEACHER_STATUS_ACTIVE;
 
-      const cpfUnformatted = cpf
-        .replace('.', '')
-        .replace('.', '')
-        .replace('-', '');
 
       const cpfExists = await _person2.default.findOne({
-        where: { cpf: cpfUnformatted },
+        where: { cpf: Unformatted(cpf) },
       });
 
       if (cpfExists) {
         erros.push('CPF já cadastrado');
       }
 
-      if(!_cpfcnpjvalidator.cpf.isValid(cpfUnformatted)) {
+      if(!_cpfcnpjvalidator.cpf.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
       }
 
@@ -46,7 +42,7 @@ class TeacherController {
         const person = await _person2.default.create({
           type_id,
           name,
-          cpf: cpfUnformatted,
+          cpf: Unformatted(cpf),
           email,
           birth_date,
         });
