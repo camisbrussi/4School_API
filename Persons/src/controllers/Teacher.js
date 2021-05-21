@@ -40,6 +40,10 @@ class TeacherController {
         erros.push('Digite um CPF válido');
       }
 
+      if (password.length < 6 || password.length > 50) {
+        erros.push('Senha deve ter entre 6 e 50 caracteres');
+      }
+
       if (erros.length) {
         return res.json({ success: 'Erro ao registrar professor', erros });
       } else {
@@ -239,6 +243,10 @@ class TeacherController {
 
       if(!cpfIsValid.isValid(cpfUnformatted)) {
         erros.push('Digite um CPF válido');
+      }
+
+      if (password.length < 6 || password.length > 50) {
+        erros.push('Senha deve ter entre 6 e 50 caracteres');
       }
 
       if (erros.length) {
