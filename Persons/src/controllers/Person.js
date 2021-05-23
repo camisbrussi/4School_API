@@ -9,9 +9,7 @@ class PersonController {
     const { userlogged, iduserlogged } = req.headers;
     try {
       let erros = [];
-      const { type, name, cpf, email, birth_date } = req.body;
-
-      console.log('CPF' + Unformatted(cpf));
+      const { type, name, cpf, email, birth_date } = req.body;s
 
       const cpfExists = await Person.findOne({
         where: { cpf: Unformatted(cpf) },

@@ -49,7 +49,7 @@ export default class activity extends Model {
     }
 
     static associate(models) {
-        this.belongsTo(models.activity_status, {foreignKey: "status_id", as:"status"});
+        this.belongsTo(models.activity_status, {foreignKey: "status_id", as:"activity_status"});
         // this.hasOne(models.activity_status, {foreignKey: 'status_id'})
 
         this.hasMany(models.activity_has_participant, {foreignKey: "activity_id"});

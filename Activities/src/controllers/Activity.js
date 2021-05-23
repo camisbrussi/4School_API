@@ -9,6 +9,8 @@ import Person from '../models/person';
 import PersonType from '../models/person_type';
 import Phone from '../models/phone';
 
+import { Op } from 'sequelize';
+
 class ActivityController {
   async store(req, res) {
     const { userlogged, iduserlogged } = req.headers;
@@ -16,14 +18,8 @@ class ActivityController {
     try {
       let erros = [];
 
-      const {
-        name,
-        description,
-        start,
-        end,
-        generate_certificate,
-        vacancies,
-      } = req.body;
+      const { name, description, start, end, generate_certificate, vacancies } =
+        req.body;
 
       const status_id = 1;
 
@@ -106,6 +102,142 @@ class ActivityController {
     res.json(activities);
   }
 
+  async showParticipantSubscriptions(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+    try {
+      const { person_id } = req.params;
+      if (!person_id) {
+        return res.status(400).json({
+          errors: ['Missing ID'],
+        });
+      }
+
+      const person = await Person.findByPk(person_id);
+      if (!person) {
+        return res.status(400).json({
+          errors: ['Person does not exist'],
+        });
+      }
+
+      const activities = await ActivityHasParticipant.findAll({
+        attributes: [
+          'id',
+          'registration_date',
+          'number_tickets',
+          'participation_date',
+          'number_participation',
+        ],
+        include: [
+          {
+            model: Activity,
+            as: 'activity',
+            attributes: ['id', 'name', 'start', 'end', 'generate_certificate'],
+            where: { status_id: process.env.ACTTIVITY_STATUS_ACTIVE },
+          },
+        ],
+        where: {
+          person_id,
+        },
+        order: [[Activity, 'name', 'asc']],
+      });
+
+      return res.json(activities);
+    } catch (e) {
+      console.log(e);
+      logger.error({
+        level: 'error',
+        message: e.errors.map((err) => err.message),
+        label: `${iduserlogged}, ${userlogged}`,
+      });
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
+    }
+  }
+
+  async filterSubscriptions(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+    try {
+      let { start, end } = req.query;
+
+      const { person_id } = req.params;
+      if (!person_id) {
+        return res.status(400).json({
+          errors: ['Missing ID'],
+        });
+      }
+
+      const person = await Person.findByPk(person_id);
+      if (!person) {
+        return res.status(400).json({
+          errors: ['Person does not exist'],
+        });
+      }
+
+      const activities = await ActivityHasParticipant.findAll({
+        attributes: [
+          'id',
+          'registration_date',
+          'number_tickets',
+          'participation_date',
+          'number_participation',
+        ],
+        include: [
+          {
+            model: Activity,
+            as: 'activity',
+            attributes: ['id', 'name', 'start', 'end', 'generate_certificate'],
+            where: {
+              [Op.and]: [
+                { status_id: process.env.ACTTIVITY_STATUS_ACTIVE },
+                { start: {[Op.gte] : start} },
+                { start: {[Op.lte]:  end} },
+              ],
+            },
+          },
+        ],
+        where: {
+          person_id,
+        },
+        order: [[Activity, 'name', 'asc']],
+      });
+      res.json(activities);
+    } catch (e) {
+      console.log(e)
+      logger.error({
+        level: 'error',
+        message: e.errors.map((err) => err.message),
+        label: `Buscar - ${userlogged}@${iduserlogged}`,
+      });
+    }
+  }
+  async vacanciesAvailable(req, res){
+
+    try {
+
+      const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({
+          errors: ['Missing ID'],
+        });
+      }
+
+      const activity = await Activity.findByPk(id);
+      if (!activity) {
+        return res.status(400).json({
+          errors: ['Activity does not exist'],
+        });
+      }
+
+      const participants = await ActivityHasParticipant.sum('number_tickets', { where: { activity_id: activity.id, }});
+
+      const vacanciesAvailable = (activity.vacancies - participants );
+
+      res.json(vacanciesAvailable);
+    } catch (error) {
+    }
+  }
+
   async show(req, res) {
     const { userlogged, iduserlogged } = req.headers;
     try {
@@ -148,12 +280,7 @@ class ActivityController {
         });
       }
 
-      const {
-        name,
-        start,
-        end,
-        vacancies,
-      } = req.body;
+      const { name, start, end, vacancies } = req.body;
 
       if (name.length < 3 || name.length > 50) {
         erros.push('Nome da atividade deve ter entre 3 e 50 caracteres');
@@ -210,15 +337,62 @@ class ActivityController {
 
         return res.json({ success: 'Editado com sucesso' });
       }
-
     } catch (e) {
-      console.log(e)
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
         label: `Edição - ${userlogged}@${iduserlogged}`,
       });
+
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
+    }
+  }
+
+  async confirmSubscription(req, res) {
+    const { userlogged, iduserlogged } = req.headers;
+    try {
+      let erros = [];
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          errors: ['Missing ID'],
+        });
+      }
+
+      const{ number_tickets } = req.body;
+
+      const subscription = await ActivityHasParticipant.findByPk(id);
+        if (!subscription) {
+          return res.status(400).json({
+            errors: ['Subscription does not exist'],
+          });
+        }
       
+      const participants = await ActivityHasParticipant.sum('number_tickets', { where: { activity_id: subscription.activity_id, }});
+        
+      if (number_tickets < participants ) {
+        erros.push('Número de vagas excedido, atualize e tente novamente');
+      }
+
+      if (erros.length) {
+        return res.json({ success: 'Erro ao confirmar participantes', erros });
+      } else {
+
+        await subscription.update({number_tickets: number_tickets});
+        return res.json({ success: 'Editado com sucesso' });
+      }
+    } catch (e) {
+      console.log(e);
+      logger.error({
+        level: 'error',
+        message: e.errors.map((err) => err.message),
+        label: `Edição - ${userlogged}@${iduserlogged}`,
+      });
+
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
       });
