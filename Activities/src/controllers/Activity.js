@@ -354,6 +354,8 @@ class ActivityController {
   async confirmSubscription(req, res) {
     const { userlogged, iduserlogged } = req.headers;
     try {
+
+      
       let erros = [];
       const { id } = req.params;
 
@@ -371,10 +373,13 @@ class ActivityController {
             errors: ['Subscription does not exist'],
           });
         }
-      
+       
       const participants = await ActivityHasParticipant.sum('number_tickets', { where: { activity_id: subscription.activity_id, }});
-        
-      if (number_tickets < participants ) {
+
+      const activity = await Activity.findByPk(subscription.activity_id);
+
+
+      if (number_tickets > ( activity.vacancies - participants) ) {
         erros.push('Número de vagas excedido, atualize e tente novamente');
       }
 
@@ -382,6 +387,7 @@ class ActivityController {
         return res.json({ success: 'Erro ao confirmar participantes', erros });
       } else {
 
+        console.log("NUMERO"+number_tickets);
         await subscription.update({number_tickets: number_tickets});
         return res.json({ success: 'Editado com sucesso' });
       }
