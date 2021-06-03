@@ -13,9 +13,7 @@ exports. default = async (req, res, next) => {
     
     const user = await _user2.default.findOne({ where: { login: userlogged } });
     const { id }  = user;
-    console.log(id)
     req.userId = id;
-    console.log(userId)
     return next();
   } catch(e){
     console.log(e);

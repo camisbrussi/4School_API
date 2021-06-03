@@ -42,6 +42,7 @@ class TokenController {
   async validate(req, res) {
     return res.json({success:'Token Válido'});
   }
+  
 }
 
 exports. default = new TokenController();

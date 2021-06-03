@@ -6,7 +6,8 @@ import { Unformatted } from '../util/unformatted';
 
 class PersonController {
   async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       let erros = [];
       const { type, name, cpf, email, birth_date } = req.body;s
@@ -37,7 +38,7 @@ class PersonController {
         logger.info({
           level: 'info',
           message: `Pessoa ${newPerson.name} (id: ${newPerson.id}) registrada com sucesso`,
-          label: `Registro - ${userlogged}@${iduserlogged}`,
+          label: `Registro - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Pessoa registrada com sucesso' });
@@ -47,7 +48,7 @@ class PersonController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registro - ${userlogged}@${iduserlogged}`,
+        label: `Registro - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.json({
@@ -58,16 +59,25 @@ class PersonController {
   }
 
   async index(req, res) {
-    const persons = await Person.findAll({
-      attributes: ['id', 'type', 'name', 'cpf', 'email', 'birth_date'],
-      order: ['name'],
-    });
-    res.json(persons);
+    try {
+      const persons = await Person.findAll({
+        attributes: ['id', 'type', 'name', 'cpf', 'email', 'birth_date'],
+        order: ['name'],
+      });
+      res.json(persons);
+    } catch (error) {
+      logger.error({
+        level: 'error',
+        message: e.errors.map((err) => err.message),
+        label: `Erro ao buscar pessoas`,
+      });
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
+    }
   }
 
   async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const { id } = req.params;
       if (!id) {
@@ -75,7 +85,6 @@ class PersonController {
           errors: ['Missing ID'],
         });
       }
-
       const person = await Person.findByPk(id);
       if (!person) {
         return res.status(400).json({
@@ -87,7 +96,7 @@ class PersonController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Busca - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar Pessoa`,
       });
 
       return res.status(400).json({
@@ -97,8 +106,8 @@ class PersonController {
   }
 
   async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -120,7 +129,7 @@ class PersonController {
       logger.info({
         level: 'info',
         message: `Pessoa id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.json({ success: 'Editado com sucesso' });
@@ -145,7 +154,7 @@ class PersonController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userLogged.login}@${userLogged.id}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -154,8 +163,6 @@ class PersonController {
   }
 
   async filter(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       let { type_id, name } = req.query;
       let where = {};
@@ -180,10 +187,9 @@ class PersonController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Buscar - ${userlogged}@${iduserlogged}`,
+        label: `Erro no filtro de pessoas}`,
       });
     }
   }
 }
-
 export default new PersonController();

@@ -10,6 +10,7 @@ router.get("/", loginRequired, teamController.index);
 router.get("/students/:id", loginRequired, teamController.getStudents);
 router.get("/filter/teams", loginRequired, teamController.filter);
 router.get("/filterstudents/:id", loginRequired, teamController.filterStudents);
+router.get("/teacher/:id", loginRequired, teamController.teamsTeacher);
 router.post("/", loginRequired, teamController.store);
 router.post("/addstudents/:id", loginRequired, teamController.storeStudents);
 router.put("/:id", loginRequired, teamController.update);

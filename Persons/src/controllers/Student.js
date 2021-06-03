@@ -17,8 +17,8 @@ import { Unformatted } from '../util/unformatted';
 
 class StudentController {
   async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       let erros = [];
 
@@ -84,7 +84,7 @@ class StudentController {
         logger.info({
           level: 'info',
           message: `Estudante ${name} (id: ${person_id})registrado com sucesso`,
-          label: `Registro - ${userlogged}@${iduserlogged}`,
+          label: `Registro - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Registrado com sucesso' });
@@ -93,7 +93,7 @@ class StudentController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registro - ${userlogged}@${iduserlogged}`,
+        label: `Registro - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.json({
@@ -104,8 +104,6 @@ class StudentController {
   }
 
   async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const students = await Student.findAll({
         attributes: ['id'],
@@ -178,14 +176,12 @@ class StudentController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Listar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao listar Estudantes`,
       });
     }
   }
 
   async indexResponsible(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const { responsible_id } = req.params;
       if (!responsible_id) {
@@ -253,14 +249,12 @@ class StudentController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Buscar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar estudantes`,
       });
     }
   }
 
   async indexFilter(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       let { status_id, name, cpf, yearBirth } = req.query;
 
@@ -336,14 +330,12 @@ class StudentController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Buscar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar Estudantes`,
       });
     }
   }
 
   async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const { id } = req.params;
       if (!id) {
@@ -426,7 +418,7 @@ class StudentController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Buscar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar estudante`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -435,8 +427,8 @@ class StudentController {
   }
 
   async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -533,7 +525,7 @@ class StudentController {
         logger.info({
           level: 'info',
           message: `Estudante id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Editado com sucesso' });
@@ -543,7 +535,7 @@ class StudentController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar estudante',
@@ -553,8 +545,8 @@ class StudentController {
   }
 
   async delete(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -576,7 +568,7 @@ class StudentController {
       logger.info({
         level: 'info',
         message: `Estudante inativado com sucesso id: ${id}, nome: ${person.name}`,
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.json('Student inactive');
@@ -584,7 +576,7 @@ class StudentController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userLogged.login}@${userLogged.id}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),

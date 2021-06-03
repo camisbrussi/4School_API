@@ -3,7 +3,8 @@ import logger from '../logger';
 
 class UserController {
   async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       let erros = [];
       const { name, login, password } = req.body;
@@ -31,16 +32,17 @@ class UserController {
         logger.info({
           level: 'Info',
           message: `Usuário ${newUser.login} (id: ${newUser.id})  registrado com sucesso`,
-          label: `Registro - ${userlogged}@${iduserlogged}`,
+          label: `Registro - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Usuário registrado com sucesso' });
       }
     } catch (e) {
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registro - ${userlogged}@${iduserlogged}`,
+        label: `Registro - ${userlogged.login}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar usuário',
@@ -50,7 +52,6 @@ class UserController {
   }
 
   async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       const users = await User.findAll({
         order: ['status_id'],
@@ -61,7 +62,7 @@ class UserController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Listar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao Listar Usuários`,
       });
 
       return res.json(null);
@@ -69,7 +70,6 @@ class UserController {
   }
 
   async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       const user = await User.findByPk(req.params.id);
 
@@ -78,7 +78,7 @@ class UserController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Busca - ${userlogged}@${iduserlogged}`,
+        label: `Busca Usuário`,
       });
 
       return res.json(null);
@@ -86,36 +86,32 @@ class UserController {
   }
 
   async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
+      
       let erros = [];
-
       const { id } = req.params;
-
+  
       if (!id) {
-        logger.error({
-          level: 'error',
-          message: ['Id Missing'],
-          label: `Edição - ${userlogged}@${iduserlogged}`,
-        });
         return res.status(400).json({
           errors: ['Id Missing'],
         });
       }
-
       const user = await User.findByPk(id);
-
       if (!user) {
-        logger.error({
-          level: 'error',
-          message: ['User does not exist'],
-          label: `Edição - ${userlogged}@${iduserlogged}`,
-        });
         return res.status(400).json({
           errors: ['User does not exist'],
         });
       }
-      const { name, login, password, status_id } = req.body;
+      
+      let {
+        status_id,
+        name, 
+        login, 
+        password, 
+        isActive,
+      } = req.body;
 
       const loginExists = await User.findOne({
         where: { login },
@@ -128,30 +124,35 @@ class UserController {
       if (erros.length) {
         return res.json({ success: 'Erro ao registrar usuário', erros });
       } else {
-      let newData;
+        if (isActive !== undefined)
+        status_id =
+          isActive === true
+            ? process.env.USER_STATUS_ACTIVE
+            : process.env.USER_STATUS_INACTIVE;
 
-      if (password) newData = await user.update(req.body);
-      else {
-        newData = await user.update({
-          status_id,
-          name,
-          login,
-        });
-      }
-      
+        if (status_id) await user.update({ status_id });
+
+        if (password) await user.update({ password });
+
+        const newData = await user.update({
+            name,
+            login,
+          });
+
         logger.info({
           level: 'info',
           message: `Usuário id: ${user.id}, login: ${user.login} editado com sucesso - (name: ${newData.name} - login: ${newData.login})`,
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Usuário registrado com sucesso' });
       }
     } catch (e) {
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar usuário',
@@ -161,7 +162,8 @@ class UserController {
   }
 
   async delete(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -182,15 +184,16 @@ class UserController {
       logger.info({
         level: 'info',
         message: `Usuário inativado com sucesso id: ${user.id}, login ${user.login}`,
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.json({ success: 'Usuário inativo' });
     } catch (e) {
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userlogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({

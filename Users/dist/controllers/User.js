@@ -3,7 +3,7 @@ var _logger = require('../logger'); var _logger2 = _interopRequireDefault(_logge
 
 class UserController {
   async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged, userLogged.id } = req.headers;
     try {
       let erros = [];
       const { name, login, password } = req.body;
@@ -31,7 +31,7 @@ class UserController {
         _logger2.default.info({
           level: 'Info',
           message: `Usuário ${newUser.login} (id: ${newUser.id})  registrado com sucesso`,
-          label: `Registro - ${userlogged}@${iduserlogged}`,
+          label: `Registro - ${userlogged}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Usuário registrado com sucesso' });
@@ -40,7 +40,7 @@ class UserController {
       _logger2.default.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registro - ${userlogged}@${iduserlogged}`,
+        label: `Registro - ${userlogged}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar usuário',
@@ -50,7 +50,7 @@ class UserController {
   }
 
   async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged, userLogged.id } = req.headers;
     try {
       const users = await _user2.default.findAll({
         order: ['status_id'],
@@ -61,7 +61,7 @@ class UserController {
       _logger2.default.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Listar - ${userlogged}@${iduserlogged}`,
+        label: `Listar - ${userlogged}@${userLogged.id}`,
       });
 
       return res.json(null);
@@ -69,7 +69,7 @@ class UserController {
   }
 
   async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged, userLogged.id } = req.headers;
     try {
       const user = await _user2.default.findByPk(req.params.id);
 
@@ -78,7 +78,7 @@ class UserController {
       _logger2.default.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Busca - ${userlogged}@${iduserlogged}`,
+        label: `Busca - ${userlogged}@${userLogged.id}`,
       });
 
       return res.json(null);
@@ -86,7 +86,7 @@ class UserController {
   }
 
   async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged, userLogged.id } = req.headers;
     try {
       let erros = [];
 
@@ -96,7 +96,7 @@ class UserController {
         _logger2.default.error({
           level: 'error',
           message: ['Id Missing'],
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userlogged}@${userLogged.id}`,
         });
         return res.status(400).json({
           errors: ['Id Missing'],
@@ -109,7 +109,7 @@ class UserController {
         _logger2.default.error({
           level: 'error',
           message: ['User does not exist'],
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userlogged}@${userLogged.id}`,
         });
         return res.status(400).json({
           errors: ['User does not exist'],
@@ -142,7 +142,7 @@ class UserController {
         _logger2.default.info({
           level: 'info',
           message: `Usuário id: ${user.id}, login: ${user.login} editado com sucesso - (name: ${newData.name} - login: ${newData.login})`,
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userlogged}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Usuário registrado com sucesso' });
@@ -151,7 +151,7 @@ class UserController {
       _logger2.default.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userlogged}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar usuário',
@@ -161,7 +161,7 @@ class UserController {
   }
 
   async delete(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged, userLogged.id } = req.headers;
     try {
       const { id } = req.params;
 
@@ -182,7 +182,7 @@ class UserController {
       _logger2.default.info({
         level: 'info',
         message: `Usuário inativado com sucesso id: ${user.id}, login ${user.login}`,
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userlogged}@${userLogged.id}`,
       });
 
       return res.json({ success: 'Usuário inativo' });
@@ -190,7 +190,7 @@ class UserController {
       _logger2.default.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userlogged}@${userLogged.id}`,
       });
 
       return res.status(400).json({

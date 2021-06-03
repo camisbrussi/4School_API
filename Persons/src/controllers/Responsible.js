@@ -14,8 +14,8 @@ import { Unformatted } from '../util/unformatted';
 
 class ResponsibleController {
   async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       let erros = [];
 
@@ -92,7 +92,7 @@ class ResponsibleController {
         logger.info({
           level: 'info',
           message: `Responsável id: ${name} (id: ${person_id}) registrado com sucesso`,
-          label: `Registro - ${userlogged}@${iduserlogged}`,
+          label: `Registro -  ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({
@@ -105,7 +105,7 @@ class ResponsibleController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registro - ${userlogged}@${iduserlogged}`,
+        label: `Registro -  ${userLogged.login}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar responsável',
@@ -115,8 +115,6 @@ class ResponsibleController {
   }
 
   async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const responsibles = await Responsible.findAll({
         attributes: ['id'],
@@ -147,14 +145,12 @@ class ResponsibleController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Listar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao listar Responsáveis`,
       });
     }
   }
 
   async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const { id } = req.params;
       if (!id) {
@@ -208,7 +204,7 @@ class ResponsibleController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Busca - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar Responsável`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -217,7 +213,8 @@ class ResponsibleController {
   }
 
   async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -269,10 +266,6 @@ class ResponsibleController {
         erros.push('Digite um CPF válido');
       }
 
-      if (password.length < 6 || password.length > 50) {
-        erros.push('Senha deve ter entre 6 e 50 caracteres');
-      }
-
       if (erros.length) {
         return res.json({ success: 'Erro ao registrar responsável', erros });
       } else {
@@ -315,7 +308,7 @@ class ResponsibleController {
         logger.info({
           level: 'info',
           message: `Responsável id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Editado com sucesso' });
@@ -324,7 +317,7 @@ class ResponsibleController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar responsável',

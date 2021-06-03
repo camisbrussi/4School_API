@@ -13,8 +13,8 @@ import { Op } from 'sequelize';
 
 class ActivityController {
   async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       let erros = [];
 
@@ -74,7 +74,7 @@ class ActivityController {
         logger.info({
           level: 'info',
           message: `Atividade ${newActivity.name} (id: ${newActivity.id} registrada com sucesso)`,
-          label: `Registro - ${userlogged}@${iduserlogged}`,
+          label: `Registro - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Atividade Registrada com sucesso' });
@@ -84,7 +84,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registro - ${userlogged}@${iduserlogged}`,
+        label: `Registro - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({
@@ -94,7 +94,6 @@ class ActivityController {
   }
 
   async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     const activities = await Activity.findAll({
       attributes: ['id', 'name', 'start', 'end', 'status_id'],
       order: ['status_id', ['start', 'desc'], ['name', 'asc']],
@@ -103,7 +102,6 @@ class ActivityController {
   }
 
   async showParticipantSubscriptions(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       const { person_id } = req.params;
       if (!person_id) {
@@ -140,14 +138,14 @@ class ActivityController {
         },
         order: [[Activity, 'name', 'asc']],
       });
-
+      console.log(activities);
       return res.json(activities);
     } catch (e) {
       console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Erro ao buscar participantes da atividade`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -156,16 +154,8 @@ class ActivityController {
   }
 
   async filterSubscriptions(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       let { start, end } = req.query;
-
-      const { person_id } = req.params;
-      if (!person_id) {
-        return res.status(400).json({
-          errors: ['Missing ID'],
-        });
-      }
 
       const person = await Person.findByPk(person_id);
       if (!person) {
@@ -190,8 +180,8 @@ class ActivityController {
             where: {
               [Op.and]: [
                 { status_id: process.env.ACTTIVITY_STATUS_ACTIVE },
-                { start: {[Op.gte] : start} },
-                { start: {[Op.lte]:  end} },
+                { start: { [Op.gte]: start } },
+                { start: { [Op.lte]: end } },
               ],
             },
           },
@@ -203,18 +193,16 @@ class ActivityController {
       });
       res.json(activities);
     } catch (e) {
-      console.log(e)
+      console.log(e);
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Buscar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar inscrições`,
       });
     }
   }
-  async vacanciesAvailable(req, res){
-
+  async vacanciesAvailable(req, res) {
     try {
-
       const { id } = req.params;
       if (!id) {
         return res.status(400).json({
@@ -229,17 +217,17 @@ class ActivityController {
         });
       }
 
-      const participants = await ActivityHasParticipant.sum('number_tickets', { where: { activity_id: activity.id, }});
+      const participants = await ActivityHasParticipant.sum('number_tickets', {
+        where: { activity_id: activity.id },
+      });
 
-      const vacanciesAvailable = (activity.vacancies - participants );
+      const vacanciesAvailable = activity.vacancies - participants;
 
       res.json(vacanciesAvailable);
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
       if (!id) {
@@ -260,7 +248,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Busca - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar atividade`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -269,7 +257,8 @@ class ActivityController {
   }
 
   async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       let erros = [];
       const { id } = req.params;
@@ -280,7 +269,21 @@ class ActivityController {
         });
       }
 
-      const { name, start, end, vacancies } = req.body;
+      const activity = await Activity.findByPk(id);
+        if (!activity) {
+          return res.status(400).json({
+            errors: ['Activity does not exist'],
+          });
+        }
+
+      let {
+        status_id,
+        name,
+        start, 
+        end,
+        vacancies,
+        isActive,
+      } = req.body;
 
       if (name.length < 3 || name.length > 50) {
         erros.push('Nome da atividade deve ter entre 3 e 50 caracteres');
@@ -320,19 +323,26 @@ class ActivityController {
       if (erros.length) {
         return res.json({ success: 'Erro ao registrar usuário', erros });
       } else {
-        const activity = await Activity.findByPk(id);
-        if (!activity) {
-          return res.status(400).json({
-            errors: ['Activity does not exist'],
-          });
-        }
 
-        const newActivity = await activity.update(req.body);
+        if (isActive !== undefined)
+        status_id =
+          isActive === true
+            ? process.env.ACTTIVITY_STATUS_ACTIVE
+            : process.env.ACTTIVITY_STATUS_INACTIVE;
+
+        if (status_id) await activity.update({ status_id });
+        
+        const newActivity = await activity.update({
+          name,
+          start, 
+          end,
+          vacancies,
+        });
 
         logger.info({
           level: 'info',
           message: `Atividade id: ${activity.id}, nome: ${activity.name}, inicio ${activity.start}, fim ${activity.end}, vagas ${activity.vacancies}, certificado ${activity.generate_certificate} - (nome: ${newActivity.name}, inicio ${newActivity.start}, fim ${newActivity.end}, vagas ${newActivity.vacancies}, certificado ${newActivity.generate_certificate})`,
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Editado com sucesso' });
@@ -342,7 +352,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({
@@ -352,10 +362,9 @@ class ActivityController {
   }
 
   async confirmSubscription(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
-
-      
       let erros = [];
       const { id } = req.params;
 
@@ -365,30 +374,30 @@ class ActivityController {
         });
       }
 
-      const{ number_tickets } = req.body;
+      const { number_tickets } = req.body;
 
       const subscription = await ActivityHasParticipant.findByPk(id);
-        if (!subscription) {
-          return res.status(400).json({
-            errors: ['Subscription does not exist'],
-          });
-        }
-       
-      const participants = await ActivityHasParticipant.sum('number_tickets', { where: { activity_id: subscription.activity_id, }});
+      if (!subscription) {
+        return res.status(400).json({
+          errors: ['Subscription does not exist'],
+        });
+      }
+
+      const participants = await ActivityHasParticipant.sum('number_tickets', {
+        where: { activity_id: subscription.activity_id },
+      });
 
       const activity = await Activity.findByPk(subscription.activity_id);
 
-
-      if (number_tickets > ( activity.vacancies - participants) ) {
+      if (number_tickets > activity.vacancies - participants) {
         erros.push('Número de vagas excedido, atualize e tente novamente');
       }
 
       if (erros.length) {
         return res.json({ success: 'Erro ao confirmar participantes', erros });
       } else {
-
-        console.log("NUMERO"+number_tickets);
-        await subscription.update({number_tickets: number_tickets});
+        console.log('NUMERO' + number_tickets);
+        await subscription.update({ number_tickets: number_tickets });
         return res.json({ success: 'Editado com sucesso' });
       }
     } catch (e) {
@@ -396,7 +405,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({
@@ -406,7 +415,8 @@ class ActivityController {
   }
 
   async delete(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -427,7 +437,7 @@ class ActivityController {
       logger.info({
         level: 'info',
         message: `Atividade inativada com sucesso ${activity.name}`,
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userLogged.login}@${userLogged.id}}`,
       });
 
       return res.json({ success: 'Atividade inativa' });
@@ -435,7 +445,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Inativação - ${userlogged}@${iduserlogged}`,
+        label: `Inativação - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({
@@ -445,7 +455,6 @@ class ActivityController {
   }
 
   async showParticipants(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
       if (!id) {
@@ -500,7 +509,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Erro ao buscar participante`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -509,7 +518,6 @@ class ActivityController {
   }
 
   async showParticipantsTeachers(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       const { id } = req.params;
       if (!id) {
@@ -564,7 +572,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `${iduserlogged}, ${userlogged}`,
+        label: `Erro ao buscar professor`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -573,7 +581,8 @@ class ActivityController {
   }
 
   async storeParticipants(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
 
     try {
       const { id } = req.params;
@@ -642,7 +651,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registrar, ${iduserlogged}, ${userlogged}`,
+        label: `Registrar, ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({
@@ -652,7 +661,8 @@ class ActivityController {
   }
 
   async deleteSubscription(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       // const {id} = req.params;
       const { subscriptionId } = req.params;
@@ -676,7 +686,7 @@ class ActivityController {
       logger.info({
         level: 'info',
         message: `Inscrição deletada com sucesso ${subscription.id}`,
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Deletar, ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.json({ success: 'Inscrição removida' });
@@ -684,7 +694,7 @@ class ActivityController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Deletar, ${iduserlogged}, ${userlogged}`,
+        label: `Deletar, ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({

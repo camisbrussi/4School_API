@@ -9,7 +9,6 @@ import { sender } from "../config/emailConfig";
 
 class SendMailController {
   async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
     try {
       const send = await Message.findAll({
         order: ["message"],
@@ -81,7 +80,8 @@ class SendMailController {
   }
 
   async store(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { destinatarios, message } = req.body;
       if (!destinatarios.length) {
@@ -118,7 +118,7 @@ class SendMailController {
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
-        label: `Envio, ${iduserlogged}, ${userlogged}`,
+        label: `Envio, ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.status(400).json({

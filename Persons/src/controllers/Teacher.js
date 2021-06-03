@@ -16,9 +16,8 @@ import { Unformatted } from '../util/unformatted';
 
 class TeacherController {
   async store(req, res) {
-    
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       
       let erros = [];
@@ -95,7 +94,7 @@ class TeacherController {
         logger.info({
           level: 'info',
           message: `Professor ${person.name} (id: ${person.id})registrado com sucesso`,
-          label: `Registro - ${userlogged}@${iduserlogged}`,
+          label: `Registro - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Registrado com sucesso' });
@@ -105,7 +104,7 @@ class TeacherController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Registro - ${userlogged}@${iduserlogged}`,
+        label: `Registro - ${userLogged.login}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar professor',
@@ -115,8 +114,6 @@ class TeacherController {
   }
 
   async index(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const teachers = await Teacher.findAll({
         attributes: ['id'],
@@ -152,14 +149,12 @@ class TeacherController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Listar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao listar professores`,
       });
     }
   }
 
   async show(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       const { id } = req.params;
       if (!id) {
@@ -219,7 +214,7 @@ class TeacherController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Buscar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao buscar Professor`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -228,8 +223,8 @@ class TeacherController {
   }
 
   async update(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -282,10 +277,6 @@ class TeacherController {
 
       if (!cpfIsValid.isValid(Unformatted(cpf))) {
         erros.push('Digite um CPF válido');
-      }
-
-      if (password.length < 6 || password.length > 50) {
-        erros.push('Senha deve ter entre 6 e 50 caracteres');
       }
 
       if (erros.length) {
@@ -345,7 +336,7 @@ class TeacherController {
         logger.info({
           level: 'info',
           message: `Professor id: ${person.id}, nome: ${person.name}, cpf ${person.cpf}, email ${person.email}, data nascimento ${person.birth_date} - (nome: ${newData.name}, cpf ${newData.cpf}, email ${newData.email}, data nascimento ${newData.birth_date}})`,
-          label: `Edição - ${userlogged}@${iduserlogged}`,
+          label: `Edição - ${userLogged.login}@${userLogged.id}`,
         });
 
         return res.json({ success: 'Editado com sucesso' });
@@ -354,7 +345,7 @@ class TeacherController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Edição - ${userlogged}@${iduserlogged}`,
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
       });
       return res.json({
         success: 'Erro ao registrar professor',
@@ -364,8 +355,8 @@ class TeacherController {
   }
 
   async delete(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
     try {
       const { id } = req.params;
 
@@ -387,7 +378,7 @@ class TeacherController {
       logger.info({
         level: 'info',
         message: `Professor inativado com sucesso id: ${id}, nome ${person.name}`,
-        label: `Exclusão - ${userlogged}@${iduserlogged}`,
+        label: `Exclusão - ${userLogged.login}@${userLogged.id}`,
       });
 
       return res.json('Teacher inactive');
@@ -395,7 +386,7 @@ class TeacherController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Exclusão - ${userlogged}@${iduserlogged}`,
+        label: `Exclusão - ${userLogged.login}@${userLogged.id}`,
       });
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -404,8 +395,6 @@ class TeacherController {
   }
 
   async indexFilter(req, res) {
-    const { userlogged, iduserlogged } = req.headers;
-
     try {
       let { status_id, name, cpf, yearBirth } = req.query;
 
@@ -457,7 +446,7 @@ class TeacherController {
       logger.error({
         level: 'error',
         message: e.errors.map((err) => err.message),
-        label: `Buscar, ${iduserlogged}, ${userlogged}`,
+        label: `Erro no filtro de professores`,
       });
     }
   }
