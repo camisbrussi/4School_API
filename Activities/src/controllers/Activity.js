@@ -414,6 +414,52 @@ class ActivityController {
     }
   }
 
+  async confirmParticipation(req, res) {
+    const { userlogged } = req.headers;
+    const userLogged = JSON.parse(userlogged);
+    try {
+      let erros = [];
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          errors: ['Missing ID'],
+        });
+      }
+
+      const { number_participation } = req.body;
+
+      const subscription = await ActivityHasParticipant.findByPk(id);
+      if (!subscription) {
+        return res.status(400).json({
+          errors: ['Subscription does not exist'],
+        });
+      }
+
+      if (number_participation > subscription.number_tickets) {
+        erros.push('Número de participantes maior que o número de vagas reservado.');
+      }
+
+      if (erros.length) {
+        return res.json({ success: 'Erro ao confirmar participação', erros });
+      } else {
+        await subscription.update({ number_participation: number_participation, participation_date: new Date() });
+        return res.json({ success: 'Editado com sucesso' });
+      }
+    } catch (e) {
+      console.log(e);
+      logger.error({
+        level: 'error',
+        message: e.errors.map((err) => err.message),
+        label: `Edição - ${userLogged.login}@${userLogged.id}`,
+      });
+
+      return res.status(400).json({
+        errors: e.errors.map((err) => err.message),
+      });
+    }
+  }
+
   async delete(req, res) {
     const { userlogged } = req.headers;
     const userLogged = JSON.parse(userlogged);

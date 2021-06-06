@@ -16,6 +16,7 @@ router.post("/", loginRequired, activityController.store);
 router.post("/addparticipants/:id", loginRequired, activityController.storeParticipants);
 router.put("/:id", loginRequired, activityController.update);
 router.put("/confirmsubscription/:id", loginRequired, activityController.confirmSubscription);
+router.put("/confirmparticipation/:id", loginRequired, activityController.confirmParticipation);
 router.delete("/:id", loginRequired, activityController.delete);
 router.delete("/subscription/:subscriptionId", loginRequired, activityController.deleteSubscription);
 
