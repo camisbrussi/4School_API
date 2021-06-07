@@ -19,7 +19,7 @@ class SendMailController {
       logger.error({
         level: "error",
         messages: e.errors.map((err) => err.messages),
-        label: `Listar - ${userlogged}@${iduserlogged}`,
+        label: `Erro ao listar Mensagens`,
       });
 
       return res.json(null);
@@ -28,6 +28,7 @@ class SendMailController {
 
   async send(req, res) {
     try {
+      
       const registration_log = await Message.findOne({
         where: { email_sent: 0 },
         //para whats tratar isso

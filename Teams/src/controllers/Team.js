@@ -551,7 +551,8 @@ class TeamController {
         },
       });
 
-      res.json(teams);
+      console.log(teams);
+      return res.json(teams);
     } catch (e) {
       console.log(e);
       logger.error({

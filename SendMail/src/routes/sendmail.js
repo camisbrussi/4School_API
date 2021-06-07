@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import sendMailController from '../controllers/SendMail'
 
-
+import loginRequired from "../middlewares/loginRequired";
 
 const router = new Router();
 
 
-router.get('/:id',  sendMailController.send);
-router.get('/',  sendMailController.index);
+router.get('/:id', loginRequired,  sendMailController.send);
+router.get('/', loginRequired, sendMailController.index);
 
-router.post('/', sendMailController.store);
+router.post('/', loginRequired, sendMailController.store);
 
 console.log("Chegou aqui")
 

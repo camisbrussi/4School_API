@@ -138,7 +138,6 @@ class ActivityController {
         },
         order: [[Activity, 'name', 'asc']],
       });
-      console.log(activities);
       return res.json(activities);
     } catch (e) {
       console.log(e);
@@ -396,7 +395,6 @@ class ActivityController {
       if (erros.length) {
         return res.json({ success: 'Erro ao confirmar participantes', erros });
       } else {
-        console.log('NUMERO' + number_tickets);
         await subscription.update({ number_tickets: number_tickets });
         return res.json({ success: 'Editado com sucesso' });
       }
