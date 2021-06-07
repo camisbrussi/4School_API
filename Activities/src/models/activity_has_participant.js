@@ -22,7 +22,7 @@ export default class activity_has_participant extends Model {
                     defaultValue: "0",
                 },
                 participation_date: {
-                    type: Sequelize.DATEONLY,
+                    type: Sequelize.DATE,
                 },
                 number_participation: {
                     type: Sequelize.INTEGER,
