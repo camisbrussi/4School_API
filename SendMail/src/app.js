@@ -13,6 +13,8 @@ import helmet from 'helmet'
 
 import sendMailRoutes from "./routes/sendmail";
 
+import sendMailResponsible from "./routes/sendmailResponsible";
+
 
 const whiteList = [
   'http://localhost:3000',
@@ -48,6 +50,7 @@ class App {
 
   routes() {
     this.app.use("/sendmail/", sendMailRoutes);
+    this.app.use("/sendmailResponsible/", sendMailResponsible);
   }
 }
 
