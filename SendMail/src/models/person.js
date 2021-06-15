@@ -55,8 +55,8 @@ export default class person extends Model {
         // this.hasOne(models.responsible, {foreignKey: "person_id"});
         // this.hasOne(models.student, {foreignKey: "person_id"});
         this.hasMany(models.phone, {foreignKey: "person_id"});
-        this.hasMany(models.activity_has_participant, {foreignKey: "person_id"});
+        // this.hasMany(models.activity_has_participant, {foreignKey: "person_id"});
 
-        this.belongsTo(models.person_type, {foreignKey: "type_id", as:"type"});
+        // this.belongsTo(models.person_type, {foreignKey: "type_id", as:"type"});
     }
 } 

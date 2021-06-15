@@ -40,6 +40,6 @@ export default class responsible extends Model {
 
     static associate(models) {
         this.belongsTo(models.person, {foreignKey:"person_id", as:"person"});
-        this.hasMany(models.student, {foreignKey:"responsible_id", as:"student"})
+        // this.hasMany(models.student, {foreignKey:"responsible_id", as:"student"})
     }
 } 

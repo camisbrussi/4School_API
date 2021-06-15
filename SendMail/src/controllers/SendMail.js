@@ -6,11 +6,20 @@ import Message from "../models/message";
 import Person from "../models/person";
 import logger from "../logger";
 import { sender } from "../config/emailConfig";
+import PersonType from "../../../Persons/src/models/person_type";
+import Phone from "../models/phone";
 
 class SendMailController {
   async index(req, res) {
     try {
       const send = await Message.findAll({
+        include: [
+          {
+            model: Person,
+            as: 'person',
+            attributes: ['name']
+          },
+        ],
         order: ["message"],
       });
 
@@ -84,38 +93,50 @@ class SendMailController {
     const { userlogged } = req.headers;
     const userLogged = JSON.parse(userlogged);
     try {
-      const { destinatarios, message } = req.body;
+      const { destinatarios, message, send_email, send_whatsapp } = req.body;
       if (!destinatarios.length) {
         return res.status(400).json({
-          errors: ["Missing Students"],
+          errors: ["Informe os destinatários"],
         });
       }
 
-      let erros = [];
-
-      //- E agora salvamos os participantes da atividade
+      //- E agora salvamos os destinatarios da mensagem
       for (let i = 0; i < destinatarios.length; i++) {
         let person_id = destinatarios[i].id;
 
-        const { email } = await Person.findByPk(person_id);
-
-        //- Ainda nao possui esse participante nessa atividade, entao registra
-        await Message.create({
-          person_id,
-          email,
-          message,
-          send_email: 1,
-          send_whatsapp: 0,
+        const person = await Person.findByPk(person_id,{
+          attributes: ['email'],
+          include: [
+            {
+              model: Phone,
+              as: 'phones',
+              attributes: ['number'],
+              where: {
+                is_whatsapp: 1
+              }
+            },
+          ],
         });
+
+        let email = send_email ? person.email : null;
+        let number = send_whatsapp && person.phones.length ? person.phones[0].number : null;
+
+        if (email != null || number != null) {
+          //- Cria a mensagem
+          await Message.create({
+            person_id,
+            email,
+            number,
+            message,
+            send_email: send_email,
+            send_whatsapp: send_whatsapp,
+          });
+        }
       }
 
-      if (erros.length)
-        return res.json({
-          success: "Erro ao enviar e-mail",
-          erros,
-        });
-      else return res.json({ success: "Enviado com sucesso" });
+      return res.json({ success: "Enviado com sucesso" });
     } catch (e) {
+      console.log(e);
       logger.error({
         level: "error",
         message: e.errors.map((err) => err.message),
