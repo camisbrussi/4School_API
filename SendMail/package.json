@@ -29,6 +29,7 @@
     "mysql2": "^2.2.5",
     "nodemailer": "^6.6.0",
     "sequelize": "^6.6.2",
+    "wbm": "^1.1.15",
     "winston": "^3.3.3"
   }
 }

@@ -5,14 +5,9 @@ import loginRequired from "../middlewares/loginRequired";
 
 const router = new Router();
 
-
 router.get('/:id', loginRequired,  sendMailController.send);
 router.get('/', loginRequired, sendMailController.index);
 
 router.post('/', loginRequired, sendMailController.store);
-
-console.log("Chegou aqui")
-
-
 
 export default router; 
