@@ -557,13 +557,13 @@ class StudentController {
       }
 
       const student = await Student.findByPk(id);
-      const person = await Person.findByPk(id);
       if (!student) {
         return res.status(400).json({
           errors: ['Student does not exist'],
         });
       }
       await student.update({ status_id: process.env.STUDENT_STATUS_INACTIVE });
+      const person = await Person.findByPk(student.person_id);
 
       logger.info({
         level: 'info',

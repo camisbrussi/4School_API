@@ -174,10 +174,20 @@ class SendMailController {
         const userLogged = JSON.parse(userlogged);
         try {
             const {destinatarios, message, send_email, send_whatsapp} = req.body;
+
+            let erros = [];
+            if (message.length <= 0) {
+                erros.push("Informe a mensagem");
+            }
             if (!destinatarios.length) {
-                return res.status(400).json({
-                    errors: ["Informe os destinatários"],
-                });
+                erros.push("Informe os destinatários");
+            }
+            if (!send_email && !send_whatsapp) {
+                erros.push("Informe se a mensagem deve ser enviada por e-mail, WhatsApp ou ambos");
+            }
+
+            if (erros.length) {
+                return res.status(200).json({ erros });
             }
 
             //- E agora salvamos os destinatarios da mensagem

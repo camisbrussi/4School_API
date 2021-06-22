@@ -367,7 +367,6 @@ class TeacherController {
       }
 
       const teacher = await Teacher.findByPk(id);
-      const person = await Person.findByPk(id);
       if (!teacher) {
         return res.status(400).json({
           errors: ['Teacher does not exist'],
@@ -375,11 +374,14 @@ class TeacherController {
       }
       await teacher.update({ status_id: process.env.TEACHER_STATUS_INACTIVE });
 
-      logger.info({
-        level: 'info',
-        message: `Professor inativado com sucesso id: ${id}, nome ${person.name}`,
-        label: `Exclusão - ${userLogged.login}@${userLogged.id}`,
-      });
+      const person = await Person.findByPk(teacher.person_id);
+      if (person) {
+        logger.info({
+          level: 'info',
+          message: `Professor inativado com sucesso id: ${id}, nome ${person.name}`,
+          label: `Exclusão - ${userLogged.login}@${userLogged.id}`,
+        });
+      }
 
       return res.json('Teacher inactive');
     } catch (e) {

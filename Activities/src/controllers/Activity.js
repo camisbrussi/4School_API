@@ -155,6 +155,7 @@ class ActivityController {
   async filterSubscriptions(req, res) {
     try {
       let { start, end } = req.query;
+      let {person_id} = req.params;
 
       const person = await Person.findByPk(person_id);
       if (!person) {
