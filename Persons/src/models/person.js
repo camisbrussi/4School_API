@@ -20,22 +20,24 @@ export default class person extends Model {
                 },
                 cpf: {
                     type: Sequelize.STRING(11),
-                    defaultValue: "",
+                    defaultValue: null,
                     validate: {
                         len: {
                             args: [11, 11],
                             msg: "Digite um número de CPF válido",
                         },
                     },
+                    allowNull: true
                 },
                 email: {
                     type: Sequelize.STRING(100),
-                    defaultValue: "",
+                    defaultValue: null,
                     validate: {
                         isEmail: {
                             msg: "Digite um Email válido",
                         },
                     },
+                    allowNull: true
                 },
                 birth_date: {
                     type: Sequelize.DATE,
